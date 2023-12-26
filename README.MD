@@ -1,0 +1,1 @@
+- note that requirements.txt will only work with conda, not pip: run `conda create --name <env> --file requirements.txt`
