@@ -2,6 +2,7 @@ name: gtc
 channels:
   - defaults
 dependencies:
+  - python=3.12
   - pip
   - ipykernel
   - numpy
@@ -14,4 +15,4 @@ dependencies:
   - cartopy
   - tqdm
   - requests
-prefix: /home/maish/miniconda3/envs/gtc
+prefix: /home/maish/miniconda3/envs/gtc # change this to the path to your conda envs -- use `conda info --envs` to figure this out
