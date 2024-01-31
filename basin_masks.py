@@ -74,7 +74,7 @@ def get_basin_solodoch(basin, geometry_filepath):
         return atlantic
 
     # Indo-Pacific Ocean: everything between 55N and 34S that isn't in the Atlantic or Southern Oceans 
-    indo_pacific = np.logical_and(np.logical_and(np.logical_and(all_oceans, minmax_lat), np.logical_not(southern)), np.logical_not(atlantic)).astype(int)
+    indo_pacific = np.logical_and(np.logical_and(np.logical_and(np.logical_and(all_oceans, minmax_lat), np.logical_not(southern)), np.logical_not(atlantic)), np.logical_not(med_mask)).astype(int)
     
     if basin == 'indo-pacific':
         return indo_pacific
