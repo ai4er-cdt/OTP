@@ -42,7 +42,7 @@ def get_longitudes_at_latitude(lat, basin, geometry_filepath, just_bounds = Fals
     relevant_lons = new_grid_lon_centers[new_grid_lat_centers == new_lat][mask_at_lat.astype(bool)]
 
     if just_bounds:
-        relevant_lons = [relevant_lons[0], relevant_lons[-1]]
+        relevant_lons = np.array([relevant_lons[0], relevant_lons[-1]])
 
     return relevant_lons
 
@@ -101,4 +101,4 @@ def resample_to_1deg(mask, geometry_filepath, new_grid_delta_lat = 1, new_grid_d
 if __name__ == '__main__':
     geom_fp = 'ECCO_L4_GEOMETRY_LLC0090GRID_V4R4/GRID_GEOMETRY_ECCO_V4r4_native_llc0090.nc'
 
-    print(get_longitudes_at_latitude(20.5, 'atlantic', geom_fp, True))
+    print(get_longitudes_at_latitude(20, 'indo-pacific', geom_fp))
