@@ -1,4 +1,5 @@
 import sys
+import math
 
 import xarray as xr
 import numpy as np
@@ -18,13 +19,15 @@ def get_longitudes_at_latitude(lat, basin, geometry_filepath, just_bounds = Fals
     basin : string
         basin name, corresponding to the available basins in the get_available_basin_names_solodoch()
         function below
+    geometry_filepath : string
+        local filepath to the ECCO geometry .nc file
     just_bounds : boolean
-        should we just return the min/max longitude?
+        should we just return bounds for the longitudes, e.g., the ranges?
 
     Returns
     -------
     lon : np.array
-        list of relevant longitudes for the latitude and basin OR longitude bounds
+        list of relevant longitudes for the latitude and basin or list of longitude bound tuples
     """
 
     # Extract the mask for the input basin
@@ -42,11 +45,16 @@ def get_longitudes_at_latitude(lat, basin, geometry_filepath, just_bounds = Fals
     relevant_lons = new_grid_lon_centers[new_grid_lat_centers == new_lat][mask_at_lat.astype(bool)]
 
     if just_bounds:
-        relevant_lons = np.array([relevant_lons[0], relevant_lons[-1]])
+        relevant_lons = extract_bounds(relevant_lons)
 
     return relevant_lons
 
 def get_basin_solodoch(basin, geometry_filepath):
+
+    """
+    Helper function to extract the basin masks as defined in Solodoch et al. (2023).
+    """
+
     assert basin in get_available_basin_names_solodoch(), f'{basin} not a valid basin, must be in {get_available_basin_names_solodoch()}'
 
     xds_geom = xr.open_dataset(geometry_filepath)
@@ -63,7 +71,7 @@ def get_basin_solodoch(basin, geometry_filepath):
     if basin == 'southern':
         return southern
 
-    # Atalntic Ocean: all of the default ECCO Atlantic basin between 55N and 34S, minus the Mediterranean
+    # Atlantic Ocean: all of the default ECCO Atlantic basin between 55N and 34S, minus the Mediterranean
     minmax_lat = xr.ones_like(xds_geom.YC).where((xds_geom.YC >= min_lat), 0).where((max_lat >= xds_geom.YC), 0).compute()
     med_mask = ecco.get_basin_mask(basin_name = 'med', mask = xr.ones_like(xds_geom.YC))
     full_atl_mask = np.logical_and(minmax_lat, np.logical_not(med_mask)).astype(int)
@@ -80,11 +88,21 @@ def get_basin_solodoch(basin, geometry_filepath):
         return indo_pacific
 
 def get_available_basin_names_solodoch():
+
+    """
+    Helper function to check the available basin names.
+    """
+
     avail_basins = ['atlantic', 'indo-pacific', 'southern']
 
     return avail_basins
 
 def resample_to_1deg(mask, geometry_filepath, new_grid_delta_lat = 1, new_grid_delta_lon = 1, new_grid_min_lat = -90, new_grid_max_lat = 90, new_grid_min_lon = -180, new_grid_max_lon = 180):
+    
+    """
+    Helper function to resample from the native ECCO grid to 1 degree latitude-longitude grid.
+    """
+    
     xds_geom = xr.open_dataset(geometry_filepath)
     
     new_grid_lon_centers, new_grid_lat_centers, _, _, mask_nearest_1deg = ecco.resample_to_latlon(xds_geom.XC, 
@@ -98,7 +116,47 @@ def resample_to_1deg(mask, geometry_filepath, new_grid_delta_lat = 1, new_grid_d
     
     return new_grid_lon_centers, new_grid_lat_centers, mask_nearest_1deg
 
+def extract_bounds(lon_list):
+
+    """
+    Helper function to find change points in a longitude list, i.e., where there is a change of more than one degree.
+    """
+
+    bounds = []
+
+    curr_lon = lon_list[0]
+
+    for i in range(len(lon_list)):
+        if i == len(lon_list) - 1:
+            bounds.append((math.floor(curr_lon), math.ceil(lon_list[i])))
+        else:
+            diff = abs(lon_list[i] - lon_list[i + 1])
+
+            if diff > 1:
+                bounds.append((math.floor(curr_lon), math.ceil(lon_list[i])))
+                curr_lon = lon_list[i + 1]
+
+    return bounds
+
+def get_lats_of_interest_solodoch(basin):
+
+    """
+    Helper function to get the latitudes of interest for reproducing Solodoch et al. (2023).
+    """
+
+    if basin == 'atlantic':
+        return [26.5]
+    elif basin == 'southern':
+        return [-55, -60]
+    elif basin == 'indo-pacific':
+        return [-30]
+
 if __name__ == '__main__':
     geom_fp = 'ECCO_L4_GEOMETRY_LLC0090GRID_V4R4/GRID_GEOMETRY_ECCO_V4r4_native_llc0090.nc'
 
-    print(get_longitudes_at_latitude(20, 'indo-pacific', geom_fp))
+    basin = 'indo-pacific'
+    lats_of_interest = get_lats_of_interest_solodoch(basin)
+
+    for lat in lats_of_interest:
+        lon_list = get_longitudes_at_latitude(lat, basin, geom_fp, just_bounds = True)
+        print(lon_list)
