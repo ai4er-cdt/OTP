@@ -19,7 +19,7 @@ from sklearn.linear_model import LinearRegression, LassoCV, HuberRegressor
 from keras.models import Sequential
 from keras.layers import Dense
 
-import LLC2ZonalStrip_V3, read_nctiles_V4r3r4
+import utils, LLC2ZonalStrip_V3, read_nctiles_V4r3r4
 
 """
 -- Aviv 2021-02-15 -- 
@@ -437,30 +437,7 @@ omitNativeGrid = not any(
     fname.startswith("tile001.mitgrid") for fname in os.listdir(dirGrid)
 )
 
-'''
-Load the grid from v4r3's 'nctiles_grid files'
-- Other file formats are 'straight', 'cube', 'compact'
-'''
-def grid_load(dirGrid, fileFormat="nctiles", omitNativeGrid=False):
-
-    if omitNativeGrid:
-        print("Native grid loading is omitted.")
-        return None
-
-    # Construct file path pattern based on fileFormat
-    if fileFormat == "nctiles":
-        filePathPattern = os.path.join(dirGrid, "*.nc")
-    else:
-        print("Unsupported file format:", fileFormat)
-        return None
-
-    # Use xarray to open a dataset; assuming NetCDF files for this example
-    # TO CHECK -- 'nested' instead of 'by_coords', with specifically defined 'concat_dim'?
-    ds = xr.open_mfdataset(filePathPattern, concat_dim='chunk', combine="nested")
-    return ds
-
-mygrid = grid_load(dirGrid)
-
+mygrid = utils.grid_load(dirGrid)
 
 # Handling Zonal Smooth Radius Degree
 if ZonalSmoothRadDeg > 0:
@@ -666,21 +643,6 @@ NCovarsVec = NCovars - NumInts
 CoVariate = np.nan * np.zeros((Nlat, Nlon, NCovarsVec, Nsamps))
 CoVariateScalars = np.nan * np.zeros((NumInts, Nsamps))
 
-
-def convert2pcol(X, Y, A):
-    # Define your original grid points and values
-    points = np.array([X.flatten(), Y.flatten()]).T  # Original grid points
-    values = A.flatten()  # Original data values
-
-    # Define the grid points where you want to interpolate
-    grid_lon, grid_lat = np.meshgrid(
-        np.linspace(lon.min(), lon.max(), 100), np.linspace(lat.min(), lat.max(), 100)
-    )
-
-    # Interpolate onto the new grid
-    return griddata(points, values, (grid_lon, grid_lat), method="linear")
-
-
 # Load and assign data if 'DensFlux' is in CoVariateNames
 if "DensFlux" in CoVariateNames:
     nc = CoVariateNames.index("DensFlux")
@@ -696,18 +658,8 @@ if "DensFlux" in CoVariateNames:
         A = read_nctiles_V4r3r4.read_nctiles(
             [dirv4r3, "nctiles_monthly/PHIBOT/PHIBOT"], "PHIBOT", 1, 1
         )
-        [X, Y] = convert2pcol(mygrid.XC, mygrid.YC, A)  # [X, Y]
+        [X, Y] = utils.convert2pcol(mygrid.XC, mygrid.YC, A)  # [X, Y]
         del A
-
-
-def calc_UEVNfromUXVY(grid, UVEL, VVEL):
-    # first interpolate velocity to cell centers
-    vel_c = grid.interp_2d_vectors({"X": UVEL, "Y": VVEL}, boundary="fill")
-
-    # Compute East and North components using cos() and sin()
-    u_east = vel_c["X"] * ds["CS"] - vel_c["Y"] * ds["SN"]
-    v_north = vel_c["X"] * ds["SN"] + vel_c["Y"] * ds["CS"]
-    return u_east, v_north
 
 
 if LoadPrev == 0:
@@ -725,7 +677,7 @@ if LoadPrev == 0:
                 fldy = xr.open_dataset(
                     f"dirv4r3/nctiles_monthly/oceTAUY/oceTAUY.{nt:04d}.nc"
                 )["oceTAUY"]
-                fldUe, fldVn = calc_UEVNfromUXVY(mygrid, fldx.values, fldy.values)
+                fldUe, fldVn = utils.calc_UEVNfromUXVY(mygrid, fldx.values, fldy.values)
                 CoVariate_t = LLC2ZonalStrip_V3(mygrid, fldUe, lat1, lat2)
             elif CoVariateName == "oceTAUY":
                 fldx = xr.open_dataset(
