@@ -30,7 +30,7 @@ grid_load(dirGrid,nFaces,fileFormat,memoryLimit,omitNativeGrid); %Load the grid.
 gcmfaces_global; % Define global variables
 
 %%
-[X,Y,B]=convert2pcol(mygrid.XC,mygrid.YC,mygrid.Depth);
+[X,Y,B]=convert2pcol(mygrid.XC,mygrid.YC,mygrid.Depth);[X,Y,B]=convert2pcol(mygrid.XC,mygrid.YC,mygrid.Depth);
 % figure; pcolor(X,Y,B); shading flat; colormap haxby; colorbar;xlim([-180,180]);
 % Bb = B; Bb(B<500) = nan;
 % figure; pcolor(X,Y,Bb); shading flat; colormap haxby; colorbar;xlim([-180,180]);
