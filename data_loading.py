@@ -47,4 +47,4 @@ if __name__ == '__main__':
 
     ecco_data = xr.open_dataset(data_fp)
     
-    print(apply_preprocessing(ecco_data))
+    print(apply_preprocessing(ecco_data, remove_trend = False, remove_season = False, standardize = True))
