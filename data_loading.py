@@ -59,7 +59,7 @@ def apply_preprocessing(dataset, remove_trend = True, remove_season = True, stan
             order = 6 # order of polynomial component of filter
 
             b, a = butter(order, cutoff, fs = fs, btype = 'low', analog = False)
-            new_var = filtfilt(b, a, new_var, axis = 0)
+            new_var = filtfilt(b, a, new_var, axis = 0) # apply on each lon timeseries separately
 
         new_var = new_var.reshape(new_var.shape[0], 1, new_var.shape[1])
         preprocessed_array[k] = (dims, new_var)
