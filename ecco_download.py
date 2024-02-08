@@ -928,6 +928,7 @@ def ecco_podaac_download_subset(ShortName,StartDate=None,EndDate=None,\
               +"-P ~/Downloads/ECCO_V4r4_PODAAC/"+ShortName+"/ \ \n"\
               +"-n "+subset_file_id+" -u username -p password")
     elif download_or_list == 'download':
+        print("Starting download...")
         start = time.time()
         try:
             # use thread pool to download in parallel, with tqdm progress bar
