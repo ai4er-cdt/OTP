@@ -1,10 +1,8 @@
-from scipy.signal import butter, filtfilt # low-pass filter
-from statsmodels.tsa.seasonal import seasonal_decompose # deseason timeseries
+from scipy.signal import butter, filtfilt 
+from statsmodels.tsa.seasonal import seasonal_decompose 
 from sklearn.preprocessing import StandardScaler
 
 import xarray as xr
-
-import sys
 
 def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
 
