@@ -21,8 +21,6 @@ from the dataset:
 For downloading of these data, see the script download_flux.py)
 '''
 
-import sys
-sys.path.append("..")
 from ecco_download import *
 
 # shared folder for data
