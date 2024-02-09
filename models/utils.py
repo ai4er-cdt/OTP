@@ -16,7 +16,7 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
                    avg_time_window: Optional[int]=None, 
                    history: Optional[int]=None,
                    data_vars: List=["SSH", "SST", "SSS", "OBP", "ZWS"],
-                   return_pt: bool=False) -> np.ndarray:
+                   return_pt: bool=False) -> np.ndarray | t.Tensor:
     """
     Read in the original input dataset, with coordinates "time", "latitude", "longitude",
     and data variables "SSH", "SST", "SSS", "OBP", "ZWS".
