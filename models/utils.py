@@ -8,26 +8,31 @@ from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.metrics import r2_score, mean_squared_error
+import torch as t
 
 
 def reshape_inputs(data: xr.core.dataset.Dataset, 
                    keep_coords: List=["time", "latitude", "longitude"],
-                   lag: Optional[int]=None, 
-                   data_vars: List=["SSH", "SST", "SSS", "OBP", "ZWS"]) -> np.ndarray:
+                   avg_time_window: Optional[int]=None, 
+                   history: Optional[int]=None,
+                   data_vars: List=["SSH", "SST", "SSS", "OBP", "ZWS"],
+                   return_pt: bool=False) -> np.ndarray:
     """
     Read in the original input dataset, with coordinates "time", "latitude", "longitude",
     and data variables "SSH", "SST", "SSS", "OBP", "ZWS".
 
-    Return a numpy array of any subset of the data variables, optionally averaged over any coordinates.
+    Return a numpy array of any subset of the data variables, optionally averaged over any coordinates or including history.
+    Can also return a pytorch tensor.
 
     data: original xarray dataset - see solodoch_data_minimal in google drive.
     keep_coords: coordinate axes to be kept. others will be averaged over and collapsed.
-    lag: if time is not included in keep_coords, optionally choose a lag over which to average.
+    avg_time_window: if time is not included in keep_coords, optionally choose a lag over which to average.
+    history: include a new axis for history (useful if we want to convolve over past values for example)
     data_vars: data variables to be kept.
+    return_pt: if true, returns a pytorch tensor (cpu!) instead of a numpy array.
 
-    TODO: add support for tensors.
     """
-
+    
     def moving_average(data: np.ndarray,
                        lag: int) -> np.ndarray:
         """
@@ -37,27 +42,37 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
         lag: lag over which to average.
         """
         # axis order is guaranteed due to reshape_inputs
-        n_features, n_times, n_lats, n_lons = data.shape
+        n_times, n_lats, n_lons, n_features = data.shape
         D = n_times - lag + 1
-        view_shape = (n_features, D, lag, n_lats, n_lons)
-        s = data.strides; strides = (s[0], s[1], s[1], s[2], s[3])
+        view_shape = (D, lag, n_lats, n_lons, n_features)
+        s = data.strides; strides = (s[0], s[0], s[1], s[2], s[3])
         data_ = as_strided(data, shape=view_shape, strides=strides)
-        return data_.mean(axis=2).squeeze(axis=2)
+        return data_.mean(axis=1).squeeze(axis=1)
     
     coords = ["time", "latitude", "longitude"]
     data = data[coords + data_vars].to_array().values
+    data = data.transpose(1, 2, 3, 0)
     for ax in coords:
         if ax not in keep_coords: 
-            if ax == "time" and lag != None: 
-                data = moving_average(data, lag)
+            if ax == "time" and avg_time_window != None: 
+                data = moving_average(data, avg_time_window)
             else:
-                data = data.mean(axis=coords.index(ax)+1)
-            coords = [c for c in coords if c != ax]
-    data = data.transpose((*(np.arange(len(coords))+1), 0))
+                data = data.mean(axis=coords.index(ax))
+            coords = [c for c in coords if c != ax]   
+
+    if history != None:
+        if "time" not in keep_coords: raise Exception("Error. 'time' must be in keep_coords in order to use history.")  
+        coords = ["time", "history"] + coords[1:]
+        n_times = data.shape[0]
+        if history > n_times: raise ValueError("Desired history is longer than the full time series.")
+        view_shape = (n_times-history+1, history, *data.shape[1:])      
+        s = data.strides[0]
+        data = as_strided(data, shape=view_shape, strides=(s, s, *data.strides[1:]))    
+
     print(f"axes: {coords + ['feature']}")
     print(f"variables: {data_vars}")
     print(f"shape: {data.shape}")    
-    return data
+    return t.Tensor(data) if return_pt else data
 
 def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
 
