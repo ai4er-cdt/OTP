@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Tuple
 
 import torch as t
 import torch.nn as nn
@@ -11,7 +11,7 @@ n_pure_layers = 3
 n_mix_layers = 3
 n_features = 5
 n_channels = n_features * 5
-kernel_size = 5
+kernel_size = (6, 5)
 # ---------------
 
 class ConvBlock(nn.Module):
@@ -19,29 +19,29 @@ class ConvBlock(nn.Module):
                  is_pure: bool,
                  n_features: int,
                  n_channels: int,
-                 kernel_size: int,
+                 kernel_size: int|Tuple[int, int],
                  n_layers: int,
                  dropout: int):
         super().__init__()
         self.n_layers = n_layers
         n_groups = n_features if is_pure else 1
         
-        self.init_conv = nn.Conv1d(in_channels=n_features,
+        self.init_conv = nn.Conv2d(in_channels=n_features,
                                    out_channels=n_channels,
                                    kernel_size=kernel_size,
                                    padding="same",
                                    groups=n_groups)
-        self.init_BN = nn.BatchNorm1d(n_channels)
+        self.init_BN = nn.BatchNorm2d(n_channels)
         self.init_dpout = nn.Dropout(dropout)
         if self.n_layers > 1:
             self.layers = nn.Sequential(
                 *[
-                    nn.Conv1d(in_channels=n_channels,
+                    nn.Conv2d(in_channels=n_channels,
                               out_channels=n_channels,
                               kernel_size=kernel_size,
                               padding="same",
                               groups=n_groups),
-                    nn.BatchNorm1d(n_channels),
+                    nn.BatchNorm2d(n_channels),
                     nn.GELU(),
                     nn.Dropout(dropout)
                 ]*(n_layers-1)
@@ -54,14 +54,14 @@ class ConvBlock(nn.Module):
         x = self.init_dpout(x)
         if self.n_layers > 1: x = self.layers(x)
         return x
-
-class CNN1D(nn.Module):
+    
+class CNN2D(nn.Module):
     def __init__(self,
                  n_pure_layers: int,
                  n_mix_layers: int,
                  n_features: int,
                  n_channels: int,
-                 kernel_size: int,
+                 kernel_size: int|Tuple[int, int],
                  dropout: int):
         super().__init__()
 
@@ -86,7 +86,7 @@ class CNN1D(nn.Module):
         if len(streams) == 2: out = t.cat((streams[0], streams[1]), dim=1)
         else: out = streams[0]
         # global average pooling
-        out = t.mean(out, dim=2)
+        out = F.avg_pool2d(out, out.shape[-2:]).squeeze()
         # final prediction
         out = self.fc(out)
         return out
