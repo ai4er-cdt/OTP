@@ -34,8 +34,10 @@ start = "1992-01-01"; end = "2017-12-31"
 
 lats = [60, 70, 120, 232] 
 lats_original = ["60S", "55S", "30s", "26N"]
+done = ["60S"]
 
 for lat, name in zip(lats, lats_original):
+    if name in done: continue
     for shortname in datasets:
         ecco_podaac_download_subset(ShortName=shortname,
                                     StartDate=start, EndDate=end,
