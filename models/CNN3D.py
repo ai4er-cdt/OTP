@@ -19,29 +19,29 @@ class ConvBlock(nn.Module):
                  is_pure: bool,
                  n_features: int,
                  n_channels: int,
-                 kernel_size: int|Tuple[int, int],
+                 kernel_size: int|Tuple[int, int, int],
                  n_layers: int,
                  dropout: int):
         super().__init__()
         self.n_layers = n_layers
         n_groups = n_features if is_pure else 1
         
-        self.init_conv = nn.Conv2d(in_channels=n_features,
+        self.init_conv = nn.Conv3d(in_channels=n_features,
                                    out_channels=n_channels,
                                    kernel_size=kernel_size,
                                    padding="same",
                                    groups=n_groups)
-        self.init_BN = nn.BatchNorm2d(n_channels)
+        self.init_BN = nn.BatchNorm3d(n_channels)
         self.init_dpout = nn.Dropout(dropout)
         if self.n_layers > 1:
             self.layers = nn.Sequential(
                 *[
-                    nn.Conv2d(in_channels=n_channels,
+                    nn.Conv3d(in_channels=n_channels,
                               out_channels=n_channels,
                               kernel_size=kernel_size,
                               padding="same",
                               groups=n_groups),
-                    nn.BatchNorm2d(n_channels),
+                    nn.BatchNorm3d(n_channels),
                     nn.GELU(),
                     nn.Dropout(dropout)
                 ]*(n_layers-1)
@@ -55,13 +55,13 @@ class ConvBlock(nn.Module):
         if self.n_layers > 1: x = self.layers(x)
         return x
     
-class CNN2D(nn.Module):
+class CNN3D(nn.Module):
     def __init__(self,
                  n_pure_layers: int,
                  n_mix_layers: int,
                  n_features: int,
                  n_channels: int,
-                 kernel_size: int|Tuple[int, int],
+                 kernel_size: int|Tuple[int, int, int],
                  dropout: int):
         super().__init__()
 
@@ -86,7 +86,7 @@ class CNN2D(nn.Module):
         if len(streams) == 2: out = t.cat((streams[0], streams[1]), dim=1)
         else: out = streams[0]
         # global average pooling
-        out = F.avg_pool2d(out, out.shape[-2:]).squeeze()
+        out = F.avg_pool3d(out, out.shape[-3:]).squeeze()
         # final prediction
         out = self.fc(out)
         return out
