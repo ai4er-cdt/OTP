@@ -104,9 +104,12 @@ def calc_streamfunction(
     return True
 
 
-def get_PSI_at_max_density_level(PSI):
+def get_PSI_at_max_density_level(PSI, max=True):
     PSI_mean = np.abs(PSI["psi_moc"].mean("time"))
-    max_index = PSI_mean.argmax(dim="k")
+    if max is True:
+        max_index = PSI_mean.argmax(dim="k")
+    else:
+        max_index = PSI_mean.argmin(dim="k")
     return PSI.isel(k=max_index)
 
 
