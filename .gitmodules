@@ -1,3 +1,4 @@
 [submodule "ECCOv4-py"]
 	path = ECCOv4-py
 	url = https://github.com/ECCO-GROUP/ECCOv4-py.git
+	ignore = dirty
