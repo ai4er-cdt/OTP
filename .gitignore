@@ -2,3 +2,4 @@
 *.nc
 JRA55 data/
 ACCESS/data/*
+ECCO/*
