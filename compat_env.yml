@@ -1,7 +1,6 @@
 name: gtc
 channels:
   - defaults
-  - conda-forge
 dependencies:
   - python=3.12
   - pip=23.3.1
@@ -16,6 +15,10 @@ dependencies:
   - cartopy=0.22.0
   - tqdm=4.63.0
   - requests=2.31.0
-  - cmocean
-  
-prefix: /Users/tomcowperthwaite/opt/anaconda3/envs/ # change this to the path to your conda envs -- use `conda info --envs` to figure this out
+  - torchaudio=2.2.0
+  - torchvision=0.17.0
+  - pytorch=2.2.0
+  - scipy=1.11.4
+  - statsmodels=0.14.1
+  - scikit-learn=1.4.0
+prefix: /Users/emiliolr/anaconda3/envs/gtc # change this to the path to your conda envs -- use `conda info --envs` to figure this out

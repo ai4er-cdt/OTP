@@ -131,7 +131,7 @@ end
 if strcmp(ECCOv,'V4r4')
     addpath ./ECCOv4r4Andrew; 
     dirv4r4 = fnos('D:/Research/NumericalModels/ECCO/Version4/Release4/',OS); 
-    if Basin==0
+    if Basin==
         if DetrendMOC*DeseasonMOC>=1
             FN_MOC_Inds = fnos('D:/Aviv/Research/AABWvsACC/ECCO/MocDiagnostics/DeepSoMOCtot_deseas_detrend_Inds2d_ECCOV4r4.mat',OS);
         else
