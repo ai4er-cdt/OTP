@@ -16,4 +16,6 @@ dependencies:
   - cartopy=0.22.0
   - tqdm=4.63.0
   - requests=2.31.0
+  - cmocean
+  
 prefix: /Users/tomcowperthwaite/opt/anaconda3/envs/ # change this to the path to your conda envs -- use `conda info --envs` to figure this out
