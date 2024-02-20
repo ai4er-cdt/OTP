@@ -1,4 +1,4 @@
 .DS_Store
 *.nc
 JRA55 data/
-ACCESS/data/
+ACCESS/data/*
