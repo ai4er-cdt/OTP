@@ -24,20 +24,19 @@ For downloading of these data, see the script download_flux.py)
 from ecco_download import *
 
 # shared folder for data
-home = "/mnt/g/My Drive/GTC/_solodoch_data_full"
+home = "/mnt/g/My Drive/GTC/ecco_data_full"
 
 # name of ecco datasets which contain input variables
 datasets = ["ECCO_L4_SSH_05DEG_MONTHLY_V4R4", "ECCO_L4_STRESS_05DEG_MONTHLY_V4R4", 
-            "ECCO_L4_OBP_05DEG_MONTHLY_V4R4", "ECCO_L4_TEMP_SALINITY_05DEG_MONTHLY_V4R4"]
+            "ECCO_L4_OBP_05DEG_MONTHLY_V4R4", "ECCO_L4_TEMP_SALINITY_05DEG_MONTHLY_V4R4",
+            "ECCO_L4_OCEAN_VEL_05DEG_MONTHLY_V4R4", "ECCO_L4_BOLUS_05DEG_MONTHLY_V4R4"]
 
 start = "1992-01-01"; end = "2017-12-31"
 
 lats = [60, 70, 120, 232] 
-lats_original = ["60S", "55S", "30s", "26N"]
-done = ["60S", "55S"]
+lats_original = ["60S", "55S", "30S", "26N"]
 
 for lat, name in zip(lats, lats_original):
-    if name in done: continue
     for shortname in datasets:
         ecco_podaac_download_subset(ShortName=shortname,
                                     StartDate=start, EndDate=end,
