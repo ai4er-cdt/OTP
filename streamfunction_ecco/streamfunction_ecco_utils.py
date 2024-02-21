@@ -2,6 +2,9 @@ import numpy as np
 import xarray as xr
 import ecco_v4_py as ecco
 
+import os
+import paths
+
 METERS_CUBED_TO_SVERDRUPS = 10**-6
 
 
@@ -61,7 +64,13 @@ def _initialize_trsp_data_array(coords, lat_vals):
 
 
 def calc_meridional_stf(
-    ds, lat_vals, doFlip=True, basin_name=None, coords=None, grid=None
+    ds,
+    lat_vals,
+    velocity_field="residual",
+    doFlip=True,
+    basin_name=None,
+    coords=None,
+    grid=None,
 ):
     """Compute the meridional overturning streamfunction in Sverdrups
     at specified latitude(s)
@@ -105,9 +114,14 @@ def calc_meridional_stf(
     # get coords
     coords = parse_coords(ds, coords, ["Z", "YC", "drF", "dyG", "dxG"])
 
-    # Compute volume transport
-    trsp_x = ds["UVELMASS"] * coords["drF"] * coords["dyG"]
-    trsp_y = ds["VVELMASS"] * coords["drF"] * coords["dxG"]
+    if velocity_field == "residual":
+        parameter_fields = ["UVELMASS", "VVELMASS"]
+    elif velocity_field == "bolus":
+        parameter_fields = ["UVELSTAR", "VVELSTAR"]
+
+    # Calculate Volume transport
+    trsp_x = ds[parameter_fields[0]] * coords["drF"] * coords["dyG"]
+    trsp_y = ds[parameter_fields[1]] * coords["drF"] * coords["dxG"]
 
     # Creates an empty streamfunction
     ds_out = meridional_trsp_at_depth(
@@ -193,20 +207,22 @@ def meridional_trsp_at_depth(
     maskW = coords["maskW"] if "maskW" in coords else xr.ones_like(xfld)
     maskS = coords["maskS"] if "maskS" in coords else xr.ones_like(yfld)
 
-    if not isinstance(basin_name, list):
-        basin_name = [basin_name]
+    if basin_name is not None:
 
-    print(basin_name)
+        if basin_name is not isinstance(basin_name, list):
+            basin_name = [basin_name]
 
-    if basin_name[0] is not None:
-        mask_totW_list = []
-        mask_totS_list = []
-        for basin in basin_name:
-            mask_totW_list.append(ecco.get_basin_mask(basin, maskW))
-            mask_totS_list.append(ecco.get_basin_mask(basin, maskS))
+        print(basin_name)
 
-    maskW = sum(mask_totW_list)
-    maskS = sum(mask_totS_list)
+        if basin_name[0] is not None:
+            mask_totW_list = []
+            mask_totS_list = []
+            for basin in basin_name:
+                mask_totW_list.append(ecco.get_basin_mask(basin, maskW))
+                mask_totS_list.append(ecco.get_basin_mask(basin, maskS))
+
+        maskW = sum(mask_totW_list)
+        maskS = sum(mask_totS_list)
 
     # These sums are the same for all lats, therefore precompute to save
     # time
