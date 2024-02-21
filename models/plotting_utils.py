@@ -5,7 +5,7 @@ def timeseries_comparison(pred, actual, time, len_xtrain, numerical_model = 'ECC
 
     """
     Plotting the results for predicted vs. actual timeseries in the same manner as Solodoch et al. (2023) 
-    for a temporal split (e.g., first 70% of timeseries is train, last 30% is test) 
+    for a temporal split (e.g., first 70% of timeseries is train, last 30% is test).
 
     Parameters
     ----------
@@ -57,7 +57,7 @@ def timeseries_comparison(pred, actual, time, len_xtrain, numerical_model = 'ECC
 def pred_vs_actual(train_pred, test_pred, train_label, test_label, numerical_model = 'ECCO', figsize = (4, 4)):
 
     """
-    Plotting the results for predicted vs. actual MOC predictions as a scatterplot
+    Plotting the results for predicted vs. actual MOC predictions as a scatterplot.
 
     Parameters
     ----------
@@ -102,7 +102,7 @@ def pred_vs_actual(train_pred, test_pred, train_label, test_label, numerical_mod
     ax.grid(alpha =  0.3)
 
     #  labeling axes
-    ax.set_xlabel('Predicted MOC Strength [Sv]')
-    ax.set_ylabel(f'{numerical_model} MOC Strength [Sv]')
+    ax.set_xlabel('Predicted MOC Strength [Sv]', weight = 'bold')
+    ax.set_ylabel(f'{numerical_model} MOC Strength [Sv]', weight = 'bold')
 
     return fig, ax
