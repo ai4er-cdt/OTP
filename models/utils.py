@@ -30,7 +30,6 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
     history: include a new axis for history (useful if we want to convolve over past values for example)
     data_vars: data variables to be kept.
     return_pt: if true, returns a pytorch tensor (cpu!) instead of a numpy array.
-
     """
     
     def moving_average(data: np.ndarray,
@@ -153,3 +152,35 @@ def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_se
         preprocessed_array[k] = (dims, new_var)
 
     return preprocessed_array
+
+def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-16'), ecco = True):
+
+    """
+    Align input and output dataset date ranges and latitudes to prepare for preprocessing. 
+    If working with ECCO, this will also extract the MOC strength variable.
+
+    Parameters
+    ----------
+    inputs : xarray.dataset
+        dataset of surface variables
+    outputs : xarray.dataset
+        dataset of MOC strength
+    date_range : tuple
+        the start and end date for extraction
+    ecco : boolean
+        is this data from ecco?
+
+    Returns
+    -------
+    inputs, outputs : xarray.dataset, xarray.dataset
+        aligned input and output datasets
+    """
+    
+    inputs = inputs.sel(time = slice(*date_range))
+    outputs = outputs.sel(time = slice(*date_range))
+    
+    if ecco:
+        outputs = outputs.moc.to_dataset()
+        outputs = outputs.rename({'lat' : 'latitude'})
+
+    return inputs, outputs
