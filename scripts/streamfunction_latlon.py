@@ -82,7 +82,8 @@ def calculate_moc(section: str,
                   use_density: bool=True,
                   density_precision: int=100,
                   data_path: str="/mnt/g/My Drive/GTC/ecco_data",
-                  plot_path: str="/mnt/g/My Drive/GTC/EDA/moc/latlon") -> np.ndarray:
+                  plot_path: str="/mnt/g/My Drive/GTC/EDA/moc/latlon",
+                  display_plot: bool=False) -> np.ndarray:
     
     sections = ["26N", "30S", "55S", "60S", "southern_ocean"]
     coordinates = ["latitude", "longitude", "Z", "time"]
@@ -168,6 +169,6 @@ def calculate_moc(section: str,
     figtitle = f"{figtitle}_density.png" if use_density else f"{figtitle}_depth.png"
     print(f"saving plot to {figtitle}")
     plt.savefig(figtitle, dpi=400)
-    plt.show()
+    if display_plot: plt.show()
 
     return moc
