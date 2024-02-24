@@ -1,193 +1,173 @@
-from typing import List
+from typing import Optional
 import numpy as np
 import xarray as xr
-from geopy.distance import distance
-from scipy.integrate import simpson
 from gsw.conversions import CT_from_pt
 from gsw.density import sigma2
-from scipy.interpolate import interp1d
+from geopy.distance import distance
+from scipy.integrate import simpson
+from multiprocessing import Pool, cpu_count
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import matplotlib.dates as mdates
+import pickle
 
-def psi_depth(d: float|np.ndarray, v: np.ndarray, Z: np.ndarray, d_lon: np.ndarray) -> np.ndarray:
-    n_lons, n_lats, n_depths, n_times = v.shape
-    if type(d) == np.ndarray: 
-        assert len(d) == n_lats
-        ixs = [list(Z).index(x) for x in d]
+
+def lat_depth(v: np.ndarray, 
+              x_Z: np.ndarray, 
+              x_lon: np.ndarray, 
+              d: np.ndarray, 
+              lat: int) -> np.ndarray:
+    _, n_lons, _, n_times = v.shape
+    ix = list(x_Z).index(d[lat])+1
+    moc = np.empty(n_times)
+    for t in range(n_times):
+        # inner integral over depth
+        inner = [simpson(y=np.nan_to_num(v[lat, l, :ix, t]), x=x_Z[:ix]) for l in range(n_lons)]
+        # outer integral over longitude
+        moc[t] = -simpson(y=inner, x=x_lon[lat, :]) / 1e6
+    return moc
+
+def lat_density(v: np.ndarray, 
+                s2: np.ndarray, 
+                x_Z: np.ndarray, 
+                x_lon: np.ndarray, 
+                d: np.ndarray, 
+                lat: int) -> np.ndarray:
+    _, n_lons, n_depths, n_times = v.shape
+    moc = np.empty(n_times)
+    # find water columns lighter than d
+    lighter = np.less_equal(s2[lat, :, 0, :], d[lat])
+    # find missing water columns
+    empty = np.isnan(s2[lat, :, :, :]).all(axis=1)
+    # find isopycnals (defaults to 0)
+    isopycnals = np.argmax(np.less_equal(s2[lat, :, :, :], d[lat]), axis=1)
+    # any defaults (0 values) represent entire water columns which are heavier than d
+    isopycnals[isopycnals == 0] = n_depths
+
+    for t in range(n_times):
+        # inner integral over depth
+        inner = np.zeros(n_lons)
+        for l in range(n_lons):
+            if not (lighter[l, t] or empty[l, t]):
+                ix = isopycnals[l, t]
+                inner[l] = simpson(y=v[lat, l, :ix, t], x=x_Z[:ix])
+        # outer integral over longitude
+        moc[t] = -simpson(y=inner, x=x_lon[lat, :]) / 1e6
+    return moc
+
+def psi(d: float|np.ndarray, 
+        v: np.ndarray, 
+        x_lon: np.ndarray, 
+        x_Z: np.ndarray,
+        s2: Optional[np.ndarray],
+        use_density: bool=False) -> np.ndarray:
+    n_lats, _, _, _ = v.shape
+    d = np.array([d]*n_lats) if np.isscalar(d) else np.asarray(d)
+    assert len(d) == n_lats
+    if use_density:
+        f = lat_density
+        args = [v, s2, x_Z, x_lon, d]
     else:
-        ixs = [list(Z).index(d)]*n_lats
-    out = np.zeros((n_lats, n_times))
-    for lat in range(n_lats):
-        ix = ixs[lat]
-        for t in range(n_times):
-            if ix == 0: 
-                out[lat, t] = 0
-                continue
-            # f: (n_lons, n_depths)
-            f = v[:, lat, :, t]
-            # inner: (n_depths,)
-            inner = np.array([simpson(y=f[:, depth], x=d_lon[lat, :]) for depth in range(n_depths)])
-            outer = simpson(y=inner[:ix], x=Z[:ix])
-            out[lat, t] = outer
-    out = -out / 1e6
-    return out
+        f = lat_depth
+        args = [v, x_Z, x_lon, d]
 
-def psi_density(d: float|np.ndarray, 
-                v: np.ndarray, 
-                Z: np.ndarray, 
-                d_lon: np.ndarray,
-                density: np.ndarray) -> np.ndarray:
-    n_lons, n_lats, n_depths, n_times = v.shape
-    if type(d) == np.ndarray: 
-        assert len(d) == n_lats
-    else:
-        d = [d]*n_lats
-    # calculate isopycnal depths (storing indices as the actual depths don't really matter)
-    isopycnals = np.zeros((n_lats, n_lons, n_times))
-    for lat in range(n_lats):
-        for lon in range(n_lons):
-            for t in range(n_times):
-                column = density[lon, lat, :, t]
-                # find the index of the first depth over which we cross this density
-                ix = np.argmax(column >= d[lat])
-                isopycnals[lat, lon, t] = ix
+    # parallelise over latitudes
+    # NOTE: in my testing, I found that parallelising over latitudes was more efficient than any other dimension
+    with Pool(cpu_count()) as pool:
+            results = pool.starmap(f, [(*args, lat) for lat in range(n_lats)]) 
+    return np.array(results)
 
-    out = np.empty((n_lats, n_times))
-    for lat in range(n_lats):
-        for t in range(n_times):
-            # f: (n_lons, n_depths)
-            f = v[:, lat, :, t]
-            # integrate over depth first (because it varies by longitude)
-            inner = []
-            for l in range(n_lons):
-                ix = int(isopycnals[lat, l, t])
-                if ix == 0: 
-                    inner.append(0)
-                else:
-                    inner.append(simpson(y=f[l, :ix], x=Z[:ix]))
-            # inner now has shape (n_lons,)
-            outer = simpson(y=inner, x=d_lon[lat, :])
-            out[lat, t] = outer
-    out = -out / 1e6
-    return out
-
-def get_moc_strength(section: str,
-                     data_path: str="/mnt/g/My Drive/GTC/ecco_data_full",
-                     use_density: bool=False,
-                     density_precision: int=10,
-                     use_bolus: bool=False,
-                     interpolate: bool=False,
-                     interp_precision: int=10) -> np.ndarray:
+def calculate_moc(section: str,
+                  use_bolus: bool=True,
+                  use_density: bool=True,
+                  density_precision: int=100,
+                  data_path: str="/mnt/g/My Drive/GTC/ecco_data",
+                  plot_path: str="/mnt/g/My Drive/GTC/EDA/moc/latlon") -> np.ndarray:
     
     sections = ["26N", "30S", "55S", "60S", "southern_ocean"]
-    # this governs the original order of coordinate axes
-    coordinates = ["longitude", "latitude", "Z", "time"]
-    if section not in sections: raise Exception(f"argument 'section' must be in: {sections}")
-
-    print("reading velocities...")
-    # get monthly mean velocity
-    vm = xr.open_mfdataset(f"{data_path}/{section}/ECCO_L4_OCEAN_VEL_05DEG_MONTHLY_V4R4/*nc",
+    coordinates = ["latitude", "longitude", "Z", "time"]
+    assert section in sections
+    print("fetching monthly mean velocities")
+    vm = xr.open_mfdataset(f"{data_path}_full/{section}/ECCO_L4_OCEAN_VEL_05DEG_MONTHLY_V4R4/*.nc",
+                        coords="minimal",
+                        data_vars="minimal",
+                        parallel=True, compat="override")
+    vm = vm[["NVEL"]].transpose(*coordinates).isel(Z=slice(None, None, -1)).fillna(0.)
+    vm = vm.rename({"NVEL": "vm"})
+    if use_bolus:
+        print("fetching bolus velocities")
+        ve = xr.open_mfdataset(f"{data_path}_full/{section}/ECCO_L4_BOLUS_05DEG_MONTHLY_V4R4/*.nc",
                             coords="minimal",
                             data_vars="minimal",
                             parallel=True, compat="override")
-    vm = vm[["NVEL"]].transpose(*coordinates)
-    vm = vm.rename({"NVEL": "vm"})
-
-    data = vm
-    if use_bolus:
-        print("adding bolus velocities...")
-        # get bolus velocity
-        ve = xr.open_mfdataset(f"{data_path}/{section}/ECCO_L4_BOLUS_05DEG_MONTHLY_V4R4/*nc",
-                                coords="minimal",
-                                data_vars="minimal",
-                                parallel=True, compat="override")
-        ve = ve[["NVELSTAR"]].transpose(*coordinates)
+        ve = ve[["NVELSTAR"]].transpose(*coordinates).isel(Z=slice(None, None, -1)).fillna(0.)
         ve = ve.rename({"NVELSTAR": "ve"})
-        data = xr.merge([vm, ve], join="inner")
-        ve = data["ve"].to_numpy(); ve = np.nan_to_num(ve)
-        ve = np.flip(ve, axis=2)
-
-    vm = data["vm"].to_numpy(); vm = np.nan_to_num(vm)
-    vm = np.flip(vm, axis=2)
-    v = vm + ve if use_bolus else vm
-    lats = data["latitude"].to_numpy()
-    lons = data["longitude"].to_numpy()
-    # flip depth axis because we integrate from the bottom up
-    Z = np.flip(data["Z"].to_numpy())
-    # get distance between each lat/lon in meters
-    grid = [[(lat, lon) for lon in lons] for lat in lats]
-    d_lon = np.array([[distance(lat[0], p).meters for p in lat] for lat in grid])
-    # geopy returns the shortest distance - we need to account for this
-    for lat in range(d_lon.shape[0]):
-        is_monotonic = (np.diff(d_lon[lat]) > 0).all()
-        if not is_monotonic:
-            halfway = max(d_lon[lat])
-            half_ix = np.argmax(d_lon[lat] == halfway)
-            delta = halfway - d_lon[lat, half_ix+1:]
-            d_lon[lat, half_ix+1:] =  halfway + delta
-
     if use_density:
-        print("using density, so reading potential temperature and absolute salinity...")
-        # open potential temperature and absolute salinity - needed to calculate sigma_2 -> isopycnals
-        data = xr.open_mfdataset(f"{data_path}/{section}/ECCO_L4_TEMP_SALINITY_05DEG_MONTHLY_V4R4/*nc",
-                                coords="minimal",
-                                data_vars="minimal",
-                                parallel=True, compat="override")
-        data = data[["SALT", "THETA"]]
-        print("converting potential temperature to conservative temperature...")
-        ct = CT_from_pt(data["THETA"], data["SALT"])
-        print("calculating potential density at 2000 decibars (sigma_2)")
-        density = sigma2(data["SALT"], ct)
-        # convert values to float16 to reduce size
-        # indices don't support float16 (why tho), so we'll settle for float32
-        for c in ["Z", "latitude", "longitude"]:
-            density.coords[c] = density.coords[c].astype("float32")
-        density = density.astype("float16")
-        # flip along the depth axis
-        density = density.isel(Z=slice(None, None, -1))
-        # re-order coordinates just in case they have been shuffled around
-        density = density.transpose(*coordinates)
-        density = density.to_numpy()
-
-        density_range = density.flatten()
-        density_range = density_range[~np.isnan(density_range)]
-        density_range = np.linspace(min(density_range), max(density_range), density_precision)
-
-    Z_interpolated = Z
-    if interpolate:
-        # interpolate depth onto a regular grid
-        Z_interpolated = np.linspace(Z[0], Z[-1], num=interp_precision)
+        print("using density: fetching temperature and salinity for calculation")
+        density = xr.open_mfdataset(f"{data_path}_full/{section}/ECCO_L4_TEMP_SALINITY_05DEG_MONTHLY_V4R4/*.nc",
+                                    coords="minimal",
+                                    data_vars="minimal",
+                                    parallel=True, compat="override")
+        density = density[["THETA", "SALT"]].transpose(*coordinates).isel(Z=slice(None, None, -1))
+        ct = CT_from_pt(SA=density["SALT"], pt=density["THETA"])
+        s2 = sigma2(SA=density["SALT"], CT=ct).to_dataset()
+        s2 = s2.rename({list(s2.data_vars)[0]: "sigma_2"})
         
-        # efficient interpolating by unfolding
-        if use_density:
-            print(f"interpolating density (over {interp_precision} depths)...")
-            temp = density.reshape(-1, len(Z))
-            temp_interpolated = np.empty((temp.shape[0], interp_precision))
-            for i, profile in enumerate(temp):
-                f = interp1d(Z, profile, bounds_error=False, fill_value="extrapolate")
-                temp_interpolated[i] = f(Z_interpolated)
-            density = temp_interpolated.reshape(len(lons), len(lats), interp_precision, density.shape[-1])
+    v = vm["vm"] + ve["ve"] if use_bolus else vm["vm"]
+    time = vm["time"].to_numpy()
+    grid = np.array([[(lat, lon) for lon in v["longitude"].to_numpy()] for lat in v["latitude"].to_numpy()])
+    # get x-coordinates of longitude measurements
+    x_lon = np.array([[0.]+[distance(latitude[i+1], latitude[i]).meters
+                            for i in range(grid.shape[1]-1)] 
+                            for latitude in grid])
+    # rounding to cm
+    x_lon = np.round(np.cumsum(x_lon, -1), 2)
+    # get x-coordinates of depth measurements
+    x_Z = v["Z"].to_numpy()
+    # unsure if -ve is a problem but getting rid of them just in case
+    x_Z += max(abs(x_Z))
+    print("loading data into memory")
+    v_np = v.to_numpy()
+    if use_density:
+        s2_np = s2["sigma_2"].to_numpy()
+        temp = s2_np.flatten()
+        temp = temp[~np.isnan(temp)]
+        sf_range = np.linspace(min(temp), max(temp), density_precision)
+    else:
+        s2_np = None
+        sf_range = x_Z
 
-        print(f"interpolating velocity (over {interp_precision} depths)...")
-        temp = v.reshape(-1, len(Z))
-        temp_interpolated = np.empty((temp.shape[0], interp_precision))
-        for i, profile in enumerate(temp):
-            f = interp1d(Z, profile, bounds_error=False, fill_value="extrapolate")
-            temp_interpolated[i] = f(Z_interpolated)
-        v = temp_interpolated.reshape(len(lons), len(lats), interp_precision, v.shape[-1])
+    args = [v_np, x_lon, x_Z, s2_np, use_density]
+    # calculate the streamfunction at all possible densities/depths
+    if use_density: print("calculating streamfunction for all densities")
+    else: print("calculating streamfunction for all depths")
+    streamfunction = np.array([psi(d, *args) for d in tqdm(sf_range)])
+    # find the density/depth with the largest absolute time-averaged streamfunction
+    d_0 = sf_range[np.argmax(abs(np.mean(streamfunction, axis=-1)), axis=0)]
+    # calculate moc strength at d_0
+    print("calculating moc strength")
+    moc = psi(d_0, *args)
 
-    psi = psi_density if use_density else psi_depth
-    args = [v, Z_interpolated, d_lon]
-    if use_density: args += [density]
-    psi_domain = density_range if use_density else Z_interpolated
+    outfile = f"/mnt/g/My Drive/GTC/ecco_data_minimal/{section}_moc"
+    outfile = f"{outfile}_density.pickle" if use_density else f"{outfile}_depth.pickle"
+    print("done!")
+    print(f"saving moc to {outfile}")
+    outfile = open(outfile, "wb")
+    pickle.dump(moc, outfile); outfile.close()
 
-    # calculate moc strength in depth space
-    streamfunction = [psi(d, *args) for d in tqdm(psi_domain)]
-    streamfunction = np.array(streamfunction)
-    # find the depth/density with largest absolute time-averaged streamfunction
-    d_0 = Z_interpolated[np.argmax(abs(np.mean(streamfunction, axis=-1)), axis=0)]
-    # calculate moc strength through this value
-    moc_strength = psi(d_0, *args)
-    # multiply by the sign
-    sign = (np.mean(moc_strength, axis=-1) > 0) * 2. - 1
-    moc_strength *= sign[:, np.newaxis]
-    return moc_strength
+    fig, ax = plt.subplots(figsize=(10, 4))
+    plot_title = f"{section}: MOC Strength"
+    plot_title = f"{plot_title} (density-space)" if use_density else f"{plot_title} (depth-space)"
+    ax.set_title(plot_title)
+    ax.set_xlabel("Year"); ax.set_ylabel("[Sv]")
+    ax.plot(time, moc[1, :], color="red", linestyle="-", linewidth="1")
+    ax.xaxis.set_tick_params(rotation=45)
+    ax.xaxis.set_major_locator(mdates.YearLocator())
+    plt.tight_layout()
+    figtitle = f"{plot_path}/{section}"
+    figtitle = f"{figtitle}_density.png" if use_density else f"{figtitle}_depth.png"
+    print(f"saving plot to {figtitle}")
+    plt.savefig(figtitle, dpi=400)
+    plt.show()
+
+    return moc
