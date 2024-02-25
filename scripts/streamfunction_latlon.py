@@ -22,35 +22,31 @@ def lat_depth(v: np.ndarray,
     moc = np.empty(n_times)
     for t in range(n_times):
         # inner integral over depth
-        inner = [simpson(y=np.nan_to_num(v[lat, l, :ix, t]), x=x_Z[:ix]) for l in range(n_lons)]
+        inner = simpson(y=np.nan_to_num(v[lat, :, :ix, t]), x=x_Z[:ix], axis=1)
         # outer integral over longitude
         moc[t] = -simpson(y=inner, x=x_lon[lat, :]) / 1e6
     return moc
 
 def lat_density(v: np.ndarray, 
-                s2: np.ndarray, 
                 x_Z: np.ndarray, 
                 x_lon: np.ndarray, 
-                d: np.ndarray, 
+                lighter: np.ndarray,
+                empty: np.ndarray,
+                isopycnals: np.ndarray,
                 lat: int) -> np.ndarray:
-    _, n_lons, n_depths, n_times = v.shape
+    _, n_lons, _, n_times = v.shape
     moc = np.empty(n_times)
-    # find water columns lighter than d
-    lighter = np.less_equal(s2[lat, :, 0, :], d[lat])
-    # find missing water columns
-    empty = np.isnan(s2[lat, :, :, :]).all(axis=1)
-    # find isopycnals (defaults to 0)
-    isopycnals = np.argmax(np.less_equal(s2[lat, :, :, :], d[lat]), axis=1)
-    # any defaults (0 values) represent entire water columns which are heavier than d
-    isopycnals[isopycnals == 0] = n_depths
 
     for t in range(n_times):
-        # inner integral over depth
-        inner = np.zeros(n_lons)
         for l in range(n_lons):
-            if not (lighter[l, t] or empty[l, t]):
-                ix = isopycnals[l, t]
-                inner[l] = simpson(y=v[lat, l, :ix, t], x=x_Z[:ix])
+            if not (lighter[lat, l, t] or empty[lat, l, t]):
+                ix = isopycnals[lat, l, t]
+            else:
+                ix = 0
+            v[lat, l, ix:, t] = 0.
+
+        # inner integral over depth
+        inner = simpson(y=v[lat, :, :, t], x=x_Z, axis=1)
         # outer integral over longitude
         moc[t] = -simpson(y=inner, x=x_lon[lat, :]) / 1e6
     return moc
@@ -61,12 +57,20 @@ def psi(d: float|np.ndarray,
         x_Z: np.ndarray,
         s2: Optional[np.ndarray],
         use_density: bool=False) -> np.ndarray:
-    n_lats, _, _, _ = v.shape
+    n_lats, _, n_depths, _ = v.shape
     d = np.array([d]*n_lats) if np.isscalar(d) else np.asarray(d)
     assert len(d) == n_lats
+    # find water columns lighter than d
+    lighter = np.less_equal(s2[:, :, 0, :], d[:, np.newaxis, np.newaxis])
+    # find missing water columns
+    empty = np.isnan(s2).all(axis=2)
+    # find isopycnals (defaults to 0)
+    isopycnals = np.argmax(np.less_equal(s2, d[:, np.newaxis, np.newaxis, np.newaxis]), axis=2)
+    # any defaults (0 values) represent entire water columns which are heavier than d
+    isopycnals[isopycnals == 0] = n_depths
     if use_density:
         f = lat_density
-        args = [v, s2, x_Z, x_lon, d]
+        args = [v, x_Z, x_lon, lighter, empty, isopycnals]
     else:
         f = lat_depth
         args = [v, x_Z, x_lon, d]
@@ -170,5 +174,5 @@ def calculate_moc(section: str,
     print(f"saving plot to {figtitle}")
     plt.savefig(figtitle, dpi=400)
     if display_plot: plt.show()
-
+    else: plt.close()
     return moc
