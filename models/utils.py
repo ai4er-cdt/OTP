@@ -16,7 +16,8 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
                    avg_time_window: Optional[int]=None,
                    history: Optional[int]=None,
                    data_vars: List=["SSH", "SST", "SSS", "OBP", "ZWS"],
-                   return_pt: bool=False) -> np.ndarray | t.Tensor:
+                   return_pt: bool=False,
+                   verbose: bool=True) -> np.ndarray | t.Tensor:
     """
     Read in the original input dataset, with coordinates "time", "latitude", "longitude",
     and data variables "SSH", "SST", "SSS", "OBP", "ZWS".
@@ -68,9 +69,10 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
         s = data.strides[0]
         data = as_strided(data, shape=view_shape, strides=(s, s, *data.strides[1:]))
 
-    print(f"axes: {coords + ['feature']}")
-    print(f"variables: {data_vars}")
-    print(f"shape: {data.shape}")
+    if verbose:
+        print(f"axes: {coords + ['feature']}")
+        print(f"variables: {data_vars}")
+        print(f"shape: {data.shape}")    
     return t.Tensor(data) if return_pt else data
 
 def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
