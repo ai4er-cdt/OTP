@@ -4,3 +4,4 @@
 JRA55 data/
 ACCESS/data/*
 ECCO/*
+*.ipynb_checkpoints/
