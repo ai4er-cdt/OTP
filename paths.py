@@ -1,7 +1,9 @@
 import os
 import config
 
-SOLODOCH_DATA = os.path.join(config.LOCAL_DIR, "ecco_data_full")
+LOCAL_DIR = config.LOCAL_DIR
+
+SOLODOCH_DATA = os.path.join(LOCAL_DIR, "ecco_data_full")
 
 geom_fp = os.path.join(
     SOLODOCH_DATA,
@@ -16,4 +18,6 @@ BOLUS_NATIVE_GRID = os.path.join(
     SOLODOCH_DATA, "ECCO_L4_BOLUS_LLC0090GRID_MONTHLY_V4R4"
 )
 
-STREAMFUNCTIONS_ECCO_OUTPUT = os.path.join(config.LOCAL_DIR, "[OLD] streamfunctions_ecco")
+STREAMFUNCTIONS_ECCO_OUTPUT = os.path.join(LOCAL_DIR, "[OLD] streamfunctions_ecco")
+
+MODELS_OUTPUT = os.path.join(LOCAL_DIR, "ecco_models")
