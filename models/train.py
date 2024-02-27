@@ -25,6 +25,7 @@ def train_model(
     name: str,
     X: np.ndarray,
     y: np.ndarray,
+    conv_dim: int,
     save_dir: str,
     device: str | None = None,
 ):
@@ -49,7 +50,7 @@ def train_model(
     for iter in trange(max_iters):
         # use dataloader to sample a batch
         x, y = next(data_iterator)
-        if x.dim() >= 2:
+        if x.dim() == (conv_dim + 1):
             x = x.unsqueeze(-1)
         # update model
         out = model(x)
@@ -85,6 +86,7 @@ def predict(
     name: str,
     X: np.ndarray,
     y: np.ndarray,
+    conv_dim: int,
     save_dir: str,
     device: str | None = None,
 ):
@@ -103,7 +105,7 @@ def predict(
     model.eval()
     with t.no_grad():
         for x, y in test_DL:
-            if x.dim() >= 2:
+            if x.dim() == (conv_dim + 1):
                 x = x.unsqueeze(-1)
             outputs = model(x)
             y_pred.extend(outputs.cpu().numpy())

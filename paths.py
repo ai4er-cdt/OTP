@@ -18,6 +18,6 @@ BOLUS_NATIVE_GRID = os.path.join(
     SOLODOCH_DATA, "ECCO_L4_BOLUS_LLC0090GRID_MONTHLY_V4R4"
 )
 
-STREAMFUNCTIONS_ECCO_OUTPUT = os.path.join(LOCAL_DIR, "streamfunctions_ecco")
+STREAMFUNCTIONS_ECCO_OUTPUT = os.path.join(LOCAL_DIR, "[OLD] streamfunctions_ecco")
 
 MODELS_OUTPUT = os.path.join(LOCAL_DIR, "ecco_models")
