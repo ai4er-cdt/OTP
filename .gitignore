@@ -6,3 +6,4 @@ ACCESS/data/*
 ECCO/*
 *.ipynb_checkpoints/
 *.png
+*.pt

@@ -15,8 +15,7 @@ t.manual_seed(123456)
 
 # default hyperparameters
 batch_size = 32
-max_iters = 5000 
-lr = 1e-3
+max_iters = 5000
 # ---------------
 
 def train_model(model: nn.Module, 
@@ -24,6 +23,7 @@ def train_model(model: nn.Module,
                 X: t.Tensor, 
                 y: t.Tensor, 
                 save_dir: str,
+                lr,
                 device: str|None=None):
     
     if device == None:
