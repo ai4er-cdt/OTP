@@ -20,4 +20,6 @@ BOLUS_NATIVE_GRID = os.path.join(
 
 STREAMFUNCTIONS_ECCO_OUTPUT = os.path.join(LOCAL_DIR, "[OLD] streamfunctions_ecco")
 
+RAPID_ARRAY = os.path.join(LOCAL_DIR, "rapid_26N")
+
 MODELS_OUTPUT = os.path.join(LOCAL_DIR, "ecco_models")
