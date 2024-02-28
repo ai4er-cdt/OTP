@@ -37,7 +37,10 @@ def sliding_window_min_max_mix(ds_xr, window_size = 5, ignore_first_last = 10, d
     if remove_above_depth is not None:
         min_depths[min_depths > remove_above_depth] = np.nan
 
-    return min_depths, max_depths, zero_depths
+    # Grab the end date of each sliding window
+    new_time = ds_xr_monthly.time[window_size - 1 : ]
+
+    return min_depths, max_depths, zero_depths, new_time
 
 if __name__ == '__main__':
     import pickle
