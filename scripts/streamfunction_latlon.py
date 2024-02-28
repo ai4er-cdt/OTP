@@ -85,9 +85,7 @@ def calculate_moc(section: str,
                   use_bolus: bool=True,
                   use_density: bool=True,
                   density_precision: int=100,
-                  data_path: str="/mnt/g/My Drive/GTC/ecco_data",
-                  plot_path: str="/mnt/g/My Drive/GTC/EDA/moc/latlon",
-                  display_plot: bool=False) -> np.ndarray:
+                  data_path: str="/mnt/g/My Drive/GTC/ecco_data") -> np.ndarray:
     
     sections = ["26N", "30S", "55S", "60S", "southern_ocean"]
     coordinates = ["latitude", "longitude", "Z", "time"]
@@ -147,11 +145,9 @@ def calculate_moc(section: str,
     if use_density: print("calculating streamfunction for all densities")
     else: print("calculating streamfunction for all depths")
     streamfunction = np.array([psi(d, *args) for d in tqdm(sf_range)])
-    # find the density/depth with the largest absolute time-averaged streamfunction
-    d_0 = sf_range[np.argmax(abs(np.mean(streamfunction, axis=-1)), axis=0)]
-    # calculate moc strength at d_0
+    d_0 = np.argmin(np.mean(streamfunction, axis=-1), axis=0)
     print("calculating moc strength")
-    moc = psi(d_0, *args)
+    moc = streamfunction[d_0]
 
     outfile = f"/mnt/g/My Drive/GTC/ecco_data_minimal/{section}_moc"
     outfile = f"{outfile}_density.pickle" if use_density else f"{outfile}_depth.pickle"
@@ -159,20 +155,4 @@ def calculate_moc(section: str,
     print(f"saving moc to {outfile}")
     outfile = open(outfile, "wb")
     pickle.dump(moc, outfile); outfile.close()
-
-    fig, ax = plt.subplots(figsize=(10, 4))
-    plot_title = f"{section}: MOC Strength"
-    plot_title = f"{plot_title} (density-space)" if use_density else f"{plot_title} (depth-space)"
-    ax.set_title(plot_title)
-    ax.set_xlabel("Year"); ax.set_ylabel("[Sv]")
-    ax.plot(time, moc[1, :], color="red", linestyle="-", linewidth="1")
-    ax.xaxis.set_tick_params(rotation=45)
-    ax.xaxis.set_major_locator(mdates.YearLocator())
-    plt.tight_layout()
-    figtitle = f"{plot_path}/{section}"
-    figtitle = f"{figtitle}_density.png" if use_density else f"{figtitle}_depth.png"
-    print(f"saving plot to {figtitle}")
-    plt.savefig(figtitle, dpi=400)
-    if display_plot: plt.show()
-    else: plt.close()
     return moc
