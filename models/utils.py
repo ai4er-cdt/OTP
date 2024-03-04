@@ -72,7 +72,7 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
     if verbose:
         print(f"axes: {coords + ['feature']}")
         print(f"variables: {data_vars}")
-        print(f"shape: {data.shape}")    
+        print(f"shape: {data.shape}")
     return t.Tensor(data) if return_pt else data
 
 def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
@@ -192,6 +192,30 @@ def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-1
         outputs = outputs.rename({'lat' : 'latitude'})
 
     return inputs, outputs
+
+def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
+
+    """
+    Helper function to write linear regression results to a text file.
+
+    Parameters
+    ----------
+    grid_search : sklearn.CVGridSearch
+        sklearn grid search object
+    fp : string
+        the filepath to write to
+    data_vars : list
+        the list of data variables in the order
+    """
+
+    with open(fp, 'w') as f:
+        f.write(f'Best hyperparameter values: {grid_search.best_params_}\n\n')
+
+        model_weights = grid_search.best_estimator_.model.params
+        data_vars = ['Intercept'] + data_vars if intercept_first else data_vars + ['Intercept']
+        named_weights = {name : weight_val for name, weight_val in zip(data_vars, model_weights)}
+        for k, v in named_weights.items():
+            f.write(f'{k} weight: {round(v, 3)}\n')
 
 if __name__ == '__main__':
     data_home = "/Users/emiliolr/Google Drive/My Drive/GTC"
