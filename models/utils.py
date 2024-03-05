@@ -7,9 +7,8 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error, root_mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 import torch as t
-
 
 def reshape_inputs(data: xr.core.dataset.Dataset,
                    keep_coords: List=["time", "latitude", "longitude"],
@@ -228,7 +227,49 @@ def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = 
         f.write('\n')
 
         for k, v in test_metrics.items():
-            f.write(f'{k}: {round(v, 3)}\n')
+            f.write(f'{k}: {v}\n')
+
+def custom_MAPE(y_test, y_pred, threshold = 0, return_num_discarded = False):
+
+    """
+    A custom mean absolute percentage error metric that ignores very small values.
+
+    Parameters
+    ----------
+    y_test : numpy.array
+        observed values on the test set (ground truth)
+    y_pred : numpy.array
+        predicted values for the test set
+    threshold : float
+        only keep observations that are more extreme than +/- threshold
+    return_num_discarded : boolean
+        should we return the number of samples that were discarded using
+        this threshold?
+
+    Returns
+    -------
+    mape, initial_len : float, integer
+    OR
+    mape : float
+        the MAPE and, optionally, the number of samples discarded
+    """
+
+    # Get starting length of test set
+    initial_len = len(y_test)
+
+    # Mask out values less extreme than threshold
+    mask = np.abs(y_test) > threshold
+    y_test, y_pred = y_test[mask], y_pred[mask]
+    new_len = len(y_test)
+
+    # Calculate the MAPE on this subset of the test set - a small number is added
+    #  to the denominator to avoid dividing by zero
+    mape = np.mean(np.abs((y_pred - y_test)) / (np.abs(y_test) + 1e-4))
+
+    if return_num_discarded:
+        return mape, initial_len - new_len
+
+    return mape
 
 if __name__ == '__main__':
     data_home = "/Users/emiliolr/Google Drive/My Drive/GTC"
