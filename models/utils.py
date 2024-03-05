@@ -193,7 +193,7 @@ def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-1
 
     return inputs, outputs
 
-def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
+def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = True):
 
     """
     Helper function to write linear regression results to a text file.
@@ -206,6 +206,14 @@ def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
         the filepath to write to
     data_vars : list
         the list of data variables in the order
+    test_metrics : dictionary
+        a dictionary of all test metrics to save
+    intercept_first : boolean
+        is the intercept the first weight or the last weight of the fitted model?
+
+    Returns
+    -------
+    None
     """
 
     with open(fp, 'w') as f:
@@ -216,6 +224,11 @@ def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
         named_weights = {name : weight_val for name, weight_val in zip(data_vars, model_weights)}
         for k, v in named_weights.items():
             f.write(f'{k} weight: {round(v, 3)}\n')
+
+        f.write('\n')
+
+        for k, v in test_metrics.items():
+            f.write(f'{k}: {round(v, 3)}\n')
 
 if __name__ == '__main__':
     data_home = "/Users/emiliolr/Google Drive/My Drive/GTC"

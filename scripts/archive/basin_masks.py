@@ -4,7 +4,8 @@ import math
 import xarray as xr
 import numpy as np
 
-sys.path.append("ECCOv4-py")
+sys.path.append("../ECCOv4-py")
+print(sys.path)
 import ecco_v4_py as ecco
 
 def get_longitudes_at_latitude(lat, basin, geometry_filepath, just_bounds = False):
@@ -14,7 +15,7 @@ def get_longitudes_at_latitude(lat, basin, geometry_filepath, just_bounds = Fals
 
     Parameters
     ----------
-    lat : float 
+    lat : float
         latitude of interest
     basin : string
         basin name, corresponding to the available basins in the get_available_basin_names_solodoch()
@@ -32,7 +33,7 @@ def get_longitudes_at_latitude(lat, basin, geometry_filepath, just_bounds = Fals
 
     # Extract the mask for the input basin
     basin_mask = get_basin_solodoch(basin, geometry_filepath)
-    
+
     # Resample to normal geo coordinate system at 1 degree resolution
     new_grid_lon_centers, new_grid_lat_centers, mask_nearest_1deg = resample_to_1deg(basin_mask, geometry_filepath)
 
@@ -81,9 +82,9 @@ def get_basin_solodoch(basin, geometry_filepath):
     if basin == 'atlantic':
         return atlantic
 
-    # Indo-Pacific Ocean: everything between 55N and 34S that isn't in the Atlantic or Southern Oceans 
+    # Indo-Pacific Ocean: everything between 55N and 34S that isn't in the Atlantic or Southern Oceans
     indo_pacific = np.logical_and(np.logical_and(np.logical_and(np.logical_and(all_oceans, minmax_lat), np.logical_not(southern)), np.logical_not(atlantic)), np.logical_not(med_mask)).astype(int)
-    
+
     if basin == 'indo-pacific':
         return indo_pacific
 
@@ -98,22 +99,22 @@ def get_available_basin_names_solodoch():
     return avail_basins
 
 def resample_to_1deg(mask, geometry_filepath, new_grid_delta_lat = 1, new_grid_delta_lon = 1, new_grid_min_lat = -90, new_grid_max_lat = 90, new_grid_min_lon = -180, new_grid_max_lon = 180):
-    
+
     """
     Helper function to resample from the native ECCO grid to 1 degree latitude-longitude grid.
     """
-    
+
     xds_geom = xr.open_dataset(geometry_filepath)
-    
-    new_grid_lon_centers, new_grid_lat_centers, _, _, mask_nearest_1deg = ecco.resample_to_latlon(xds_geom.XC, 
-                                                                                                  xds_geom.YC, 
+
+    new_grid_lon_centers, new_grid_lat_centers, _, _, mask_nearest_1deg = ecco.resample_to_latlon(xds_geom.XC,
+                                                                                                  xds_geom.YC,
                                                                                                   mask,
                                                                                                   new_grid_min_lat, new_grid_max_lat, new_grid_delta_lat,
                                                                                                   new_grid_min_lon, new_grid_max_lon, new_grid_delta_lon,
-                                                                                                  fill_value = None, 
+                                                                                                  fill_value = None,
                                                                                                   mapping_method = 'nearest_neighbor',
                                                                                                   radius_of_influence = 120000)
-    
+
     return new_grid_lon_centers, new_grid_lat_centers, mask_nearest_1deg
 
 def extract_bounds(lon_list):
@@ -152,11 +153,4 @@ def get_lats_of_interest_solodoch(basin):
         return [-30]
 
 if __name__ == '__main__':
-    geom_fp = 'ECCO_L4_GEOMETRY_LLC0090GRID_V4R4/GRID_GEOMETRY_ECCO_V4r4_native_llc0090.nc'
-
-    basin = 'indo-pacific'
-    lats_of_interest = get_lats_of_interest_solodoch(basin)
-
-    for lat in lats_of_interest:
-        lon_list = get_longitudes_at_latitude(lat, basin, geom_fp, just_bounds = True)
-        print(lon_list)
+    print('Test test test...')
