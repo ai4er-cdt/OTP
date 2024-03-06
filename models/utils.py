@@ -192,7 +192,7 @@ def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-1
 
     return inputs, outputs
 
-def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = True):
+def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = True, save_weights = True):
 
     """
     Helper function to write linear regression results to a text file.
@@ -209,6 +209,8 @@ def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = 
         a dictionary of all test metrics to save
     intercept_first : boolean
         is the intercept the first weight or the last weight of the fitted model?
+    save_weights : boolean
+        should we save the model weights?
 
     Returns
     -------
@@ -218,11 +220,15 @@ def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = 
     with open(fp, 'w') as f:
         f.write(f'Best hyperparameter values: {grid_search.best_params_}\n\n')
 
-        model_weights = grid_search.best_estimator_.model.params
-        data_vars = ['Intercept'] + data_vars if intercept_first else data_vars + ['Intercept']
-        named_weights = {name : weight_val for name, weight_val in zip(data_vars, model_weights)}
-        for k, v in named_weights.items():
-            f.write(f'{k} weight: {round(v, 3)}\n')
+        if save_weights:
+            model_weights = grid_search.best_estimator_.model.params
+            data_vars = ['Intercept'] + data_vars if intercept_first else data_vars + ['Intercept']
+            named_weights = {name : weight_val for name, weight_val in zip(data_vars, model_weights)}
+
+            for k, v in named_weights.items():
+                f.write(f'{k} weight: {round(v, 3)}\n')
+        else:
+            f.write(f'All longitudes used for: {" ".join(data_vars)}\n')
 
         f.write('\n')
 
