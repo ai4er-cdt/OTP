@@ -11,13 +11,15 @@ from sklearn.metrics import r2_score, mean_squared_error
 import torch as t
 
 
-def reshape_inputs(data: xr.core.dataset.Dataset,
-                   keep_coords: List=["time", "latitude", "longitude"],
-                   avg_time_window: Optional[int]=None,
-                   history: Optional[int]=None,
-                   data_vars: List=["SSH", "SST", "SSS", "OBP", "ZWS"],
-                   return_pt: bool=False,
-                   verbose: bool=True) -> np.ndarray | t.Tensor:
+def reshape_inputs(
+    data: xr.core.dataset.Dataset,
+    keep_coords: List = ["time", "latitude", "longitude"],
+    avg_time_window: Optional[int] = None,
+    history: Optional[int] = None,
+    data_vars: List = ["SSH", "SST", "SSS", "OBP", "ZWS"],
+    return_pt: bool = False,
+    verbose: bool = True,
+) -> np.ndarray | t.Tensor:
     """
     Read in the original input dataset, with coordinates "time", "latitude", "longitude",
     and data variables "SSH", "SST", "SSS", "OBP", "ZWS".
@@ -33,8 +35,7 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
     return_pt: if true, returns a pytorch tensor (cpu!) instead of a numpy array.
     """
 
-    def moving_average(data: np.ndarray,
-                       lag: int) -> np.ndarray:
+    def moving_average(data: np.ndarray, lag: int) -> np.ndarray:
         """
         Calculate a moving average over the time dimension.
 
@@ -45,7 +46,8 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
         n_times, n_lats, n_lons, n_features = data.shape
         D = n_times - lag + 1
         view_shape = (D, lag, n_lats, n_lons, n_features)
-        s = data.strides; strides = (s[0], s[0], s[1], s[2], s[3])
+        s = data.strides
+        strides = (s[0], s[0], s[1], s[2], s[3])
         data_ = as_strided(data, shape=view_shape, strides=strides)
         return data_.mean(axis=1).squeeze(axis=1)
 
@@ -61,11 +63,15 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
             coords = [c for c in coords if c != ax]
 
     if history != None:
-        if "time" not in keep_coords: raise Exception("Error. 'time' must be in keep_coords in order to use history.")
+        if "time" not in keep_coords:
+            raise Exception(
+                "Error. 'time' must be in keep_coords in order to use history."
+            )
         coords = ["time", "history"] + coords[1:]
         n_times = data.shape[0]
-        if history > n_times: raise ValueError("Desired history is longer than the full time series.")
-        view_shape = (n_times-history+1, history, *data.shape[1:])
+        if history > n_times:
+            raise ValueError("Desired history is longer than the full time series.")
+        view_shape = (n_times - history + 1, history, *data.shape[1:])
         s = data.strides[0]
         data = as_strided(data, shape=view_shape, strides=(s, s, *data.strides[1:]))
 
@@ -75,8 +81,15 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
         print(f"shape: {data.shape}")
     return t.Tensor(data) if return_pt else data
 
-def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
 
+def apply_preprocessing(
+    dataset,
+    mode="inputs",
+    remove_trend=True,
+    remove_season=True,
+    standardize=True,
+    lowpass=False,
+):
     """
     Preprocessing function for covariates, including de-trending, de-seasonalizing, standardization,
     and applying a low-pass filter to remove effect of short timescale variations. All operations
@@ -104,24 +117,25 @@ def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_se
         xarray dataset with the same format as input, but with preprocessed covariates
     """
 
-    avail_modes = ['inputs', 'outputs']
-    assert mode in avail_modes, f'mode argument must be one of {avail_modes}'
+    avail_modes = ["inputs", "outputs"]
+    assert mode in avail_modes, f"mode argument must be one of {avail_modes}"
 
-    if mode == 'inputs':
-        dims = ('time', 'latitude', 'longitude')
+    if mode == "inputs":
+        dims = ("time", "latitude", "longitude")
 
-        if 'latitude' not in dataset.dims:
+        if "latitude" not in dataset.dims:
             dims = (dims[0], dims[2])
-    elif mode == 'outputs':
-        dims = ('time', 'latitude')
 
-        if 'latitude' not in dataset.dims:
-            dims = (dims[0], )
+    elif mode == "outputs":
+        dims = ("time", "latitude")
+
+        if "latitude" not in dataset.dims:
+            dims = (dims[0],)
 
     # Making sure the dataset has the expected ordering or coordinates
-    if mode == 'inputs':
+    if mode == "inputs":
         dataset = dataset.transpose(*dims)
-    elif mode == 'outputs':
+    elif mode == "outputs":
         dataset = dataset.transpose(*dims)
 
     # Instantiating a new array like the original to populate with preprocessed values
@@ -130,39 +144,49 @@ def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_se
     for k in dataset.keys():
         var = dataset[k].values.squeeze()
 
-        var_deseason = seasonal_decompose(var, model = 'additive', period = 12, extrapolate_trend = 6)
-        new_var = var_deseason.resid # extract residual - the variation not captured by seasonality or long-term trend
+        var_deseason = seasonal_decompose(
+            var, model="additive", period=12, extrapolate_trend=6
+        )
+        new_var = (
+            var_deseason.resid
+        )  # extract residual - the variation not captured by seasonality or long-term trend
 
         if not remove_season:
-            new_var = new_var + var_deseason.seasonal # add back in seasonal component
+            new_var = new_var + var_deseason.seasonal  # add back in seasonal component
         if not remove_trend:
-            new_var = new_var + var_deseason.trend # add back in trend component
+            new_var = new_var + var_deseason.trend  # add back in trend component
 
         if lowpass:
-            cutoff = 2.0 # cutoff is 2.0 for 6-month LPF
-            fs = 12.0 # freq of sampling is 12.0 times in a year
-            order = 6 # order of polynomial component of filter
+            cutoff = 2.0  # cutoff is 2.0 for 6-month LPF
+            fs = 12.0  # freq of sampling is 12.0 times in a year
+            order = 6  # order of polynomial component of filter
 
-            b, a = butter(order, cutoff, fs = fs, btype = 'low', analog = False)
-            new_var = filtfilt(b, a, new_var, axis = 0) # apply on each lon timeseries separately
+            b, a = butter(order, cutoff, fs=fs, btype="low", analog=False)
+            new_var = filtfilt(
+                b, a, new_var, axis=0
+            )  # apply on each lon timeseries separately
 
         # Making sure to apply standardization last to ensure covariates have the right time-wise stats
-        if standardize and mode == 'inputs':
+        if standardize and mode == "inputs":
             scaler = StandardScaler()
+            if new_var.ndim == 1:
+                new_var = new_var.reshape(-1, 1)
             new_var = scaler.fit_transform(new_var)
 
         # Adding back in latitude dimension that got squeezed out
-        if mode == 'inputs' and 'latitude' in dataset.dims:
+        if mode == "inputs" and "latitude" in dataset.dims:
             new_var = new_var.reshape(new_var.shape[0], 1, new_var.shape[1])
-        elif mode == 'outputs' and 'latitude' in dataset.dims:
+        elif mode == "outputs" and "latitude" in dataset.dims:
             new_var = new_var.reshape(new_var.shape[0], 1)
 
         preprocessed_array[k] = (dims, new_var)
 
     return preprocessed_array
 
-def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-16'), ecco = True):
 
+def align_inputs_outputs(
+    inputs, outputs, date_range=("1992-01-16", "2015-12-16"), ecco=True
+):
     """
     Align input and output dataset date ranges and latitudes to prepare for preprocessing.
     If working with ECCO, this will also extract the MOC strength variable.
@@ -184,17 +208,17 @@ def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-1
         aligned input and output datasets
     """
 
-    inputs = inputs.sel(time = slice(*date_range))
-    outputs = outputs.sel(time = slice(*date_range))
+    inputs = inputs.sel(time=slice(*date_range))
+    outputs = outputs.sel(time=slice(*date_range))
 
     if ecco:
         outputs = outputs.moc.to_dataset()
-        outputs = outputs.rename({'lat' : 'latitude'})
+        outputs = outputs.rename({"lat": "latitude"})
 
     return inputs, outputs
 
-def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
 
+def reg_results_txt(grid_search, fp, data_vars, intercept_first=True):
     """
     Helper function to write linear regression results to a text file.
 
@@ -208,30 +232,37 @@ def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
         the list of data variables in the order
     """
 
-    with open(fp, 'w') as f:
-        f.write(f'Best hyperparameter values: {grid_search.best_params_}\n\n')
+    with open(fp, "w") as f:
+        f.write(f"Best hyperparameter values: {grid_search.best_params_}\n\n")
 
         model_weights = grid_search.best_estimator_.model.params
-        data_vars = ['Intercept'] + data_vars if intercept_first else data_vars + ['Intercept']
-        named_weights = {name : weight_val for name, weight_val in zip(data_vars, model_weights)}
+        data_vars = (
+            ["Intercept"] + data_vars if intercept_first else data_vars + ["Intercept"]
+        )
+        named_weights = {
+            name: weight_val for name, weight_val in zip(data_vars, model_weights)
+        }
         for k, v in named_weights.items():
-            f.write(f'{k} weight: {round(v, 3)}\n')
+            f.write(f"{k} weight: {round(v, 3)}\n")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     data_home = "/Users/emiliolr/Google Drive/My Drive/GTC"
     lats = ["26N", "30S", "55S", "60S"]
     lat = lats[3]
     inputs = xr.open_dataset(f"{data_home}/ecco_data_minimal/{lat}.nc")
-    inputs = inputs.sel(latitude = -59.75) # pull out just 60S
+    inputs = inputs.sel(latitude=-59.75)  # pull out just 60S
 
     remove_season = True
     remove_trend = True
 
-    pp_data = apply_preprocessing(inputs,
-                                  mode="inputs",
-                                  remove_season=remove_season,
-                                  remove_trend=remove_trend,
-                                  standardize=True,
-                                  lowpass=False)
+    pp_data = apply_preprocessing(
+        inputs,
+        mode="inputs",
+        remove_season=remove_season,
+        remove_trend=remove_trend,
+        standardize=True,
+        lowpass=False,
+    )
 
     print(pp_data)

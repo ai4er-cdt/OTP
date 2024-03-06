@@ -25,6 +25,9 @@ def train_model(
     name: str,
     X: np.ndarray,
     y: np.ndarray,
+    X_val: np.ndarray,
+    y_val: np.ndarray,
+    val_interval: 5,
     save_dir: str,
     device: str | None = None,
 ):
@@ -41,6 +44,12 @@ def train_model(
     train_DL = DataLoader(train_dataset, batch_size, shuffle=True)
     data_iterator = cycle(train_DL)
 
+    # get validation data
+    if X_val is not None:
+        best_val_loss = float("inf")
+        valid_dataset = SimDataset.SimDataset(X_val, y_val, device)
+        valid_DL = DataLoader(valid_dataset, 1, shuffle=False)
+
     # training
     model.train()
     criterion = nn.MSELoss()
@@ -56,6 +65,28 @@ def train_model(
         opt.zero_grad(set_to_none=True)
         loss.backward()
         opt.step()
+
+        # Validation check
+        if X_val is not None and iter % val_interval == 0:
+            model.eval()
+            with t.no_grad():
+                val_loss = 0
+                for val_x, val_y in valid_DL:
+                    val_out = model(val_x)
+                    val_loss += criterion(val_out.squeeze(-1), val_y).item()
+                val_loss /= len(valid_DL)
+
+                if val_loss < best_val_loss:
+                    best_val_loss = val_loss
+                    wait = 0
+                else:
+                    wait += 1
+                    if wait >= 5:
+                        print(
+                            f"Stopping early at iteration {iter}. Best validation loss: {best_val_loss}"
+                        )
+                        break
+            model.train()
 
     t.save(
         model.state_dict(),
