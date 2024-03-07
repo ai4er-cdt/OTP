@@ -7,9 +7,8 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from sklearn.base import BaseEstimator, RegressorMixin
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score, mean_squared_error, root_mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 import torch as t
-
 
 def reshape_inputs(data: xr.core.dataset.Dataset,
                    keep_coords: List=["time", "latitude", "longitude"],
@@ -195,7 +194,7 @@ def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-1
 
     return inputs, outputs
 
-def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
+def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = True, save_weights = True):
 
     """
     Helper function to write linear regression results to a text file.
@@ -208,16 +207,77 @@ def reg_results_txt(grid_search, fp, data_vars, intercept_first = True):
         the filepath to write to
     data_vars : list
         the list of data variables in the order
+    test_metrics : dictionary
+        a dictionary of all test metrics to save
+    intercept_first : boolean
+        is the intercept the first weight or the last weight of the fitted model?
+    save_weights : boolean
+        should we save the model weights?
+
+    Returns
+    -------
+    None
     """
 
     with open(fp, 'w') as f:
         f.write(f'Best hyperparameter values: {grid_search.best_params_}\n\n')
 
-        model_weights = grid_search.best_estimator_.model.params
-        data_vars = ['Intercept'] + data_vars if intercept_first else data_vars + ['Intercept']
-        named_weights = {name : weight_val for name, weight_val in zip(data_vars, model_weights)}
-        for k, v in named_weights.items():
-            f.write(f'{k} weight: {round(v, 3)}\n')
+        if save_weights:
+            model_weights = grid_search.best_estimator_.model.params
+            data_vars = ['Intercept'] + data_vars if intercept_first else data_vars + ['Intercept']
+            named_weights = {name : weight_val for name, weight_val in zip(data_vars, model_weights)}
+
+            for k, v in named_weights.items():
+                f.write(f'{k} weight: {round(v, 3)}\n')
+        else:
+            f.write(f'All longitudes used for: {" ".join(data_vars)}\n')
+
+        f.write('\n')
+
+        for k, v in test_metrics.items():
+            f.write(f'{k}: {v}\n')
+
+def custom_MAPE(y_test, y_pred, threshold = 0, return_num_discarded = False):
+
+    """
+    A custom mean absolute percentage error metric that ignores very small values.
+
+    Parameters
+    ----------
+    y_test : numpy.array
+        observed values on the test set (ground truth)
+    y_pred : numpy.array
+        predicted values for the test set
+    threshold : float
+        only keep observations that are more extreme than +/- threshold
+    return_num_discarded : boolean
+        should we return the number of samples that were discarded using
+        this threshold?
+
+    Returns
+    -------
+    mape, initial_len : float, integer
+    OR
+    mape : float
+        the MAPE and, optionally, the number of samples discarded
+    """
+
+    # Get starting length of test set
+    initial_len = len(y_test)
+
+    # Mask out values less extreme than threshold
+    mask = np.abs(y_test) > threshold
+    y_test, y_pred = y_test[mask], y_pred[mask]
+    new_len = len(y_test)
+
+    # Calculate the MAPE on this subset of the test set - a small number is added
+    #  to the denominator to avoid dividing by zero
+    mape = np.mean(np.abs((y_pred - y_test)) / (np.abs(y_test) + 1e-4))
+
+    if return_num_discarded:
+        return mape, initial_len - new_len
+
+    return mape
 
 if __name__ == '__main__':
     data_home = "/Users/emiliolr/Google Drive/My Drive/GTC"
