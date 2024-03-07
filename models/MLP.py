@@ -41,8 +41,6 @@ class MLP(nn.Module):
         self.ln_end = nn.Linear(in_features=hidden_dim_width[-1], out_features=1)
         self.ln_end.apply(weights_init)
 
-
-
     def forward(self, x) -> Any:
         out = F.gelu(self.ln_start(x))
         out = F.dropout(out, self.dropout)

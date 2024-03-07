@@ -8,8 +8,8 @@ class MLP(nn.Module):
                  n_features: int,
                  hidden_dim_width: int=1):
         super().__init__()
-        self.ln_start = nn.Linear(in_features=n_features, out_features=hidden_dim_width)
-        self.ln_end = nn.Linear(in_features=hidden_dim_width, out_features=1)
+        self.ln_start = nn.Linear(in_features=n_features, out_features=hidden_dim_width, dtype=t.float32)
+        self.ln_end = nn.Linear(in_features=hidden_dim_width, out_features=1, dtype=t.float32)
 
     def forward(self, x):
         out = F.relu(self.ln_start(x))
