@@ -148,6 +148,8 @@ def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_se
         # Making sure to apply standardization last to ensure covariates have the right time-wise stats
         if standardize and mode == 'inputs':
             scaler = StandardScaler()
+            if new_var.ndim == 1:
+                new_var = new_var.reshape(-1, 1)
             new_var = scaler.fit_transform(new_var)
 
         # Adding back in latitude dimension that got squeezed out

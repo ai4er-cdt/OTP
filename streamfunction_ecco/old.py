@@ -106,54 +106,6 @@ def calc_streamfunction(
     return True
 
 
-def plot_depth_stf_vs_time(stf_ds, label, param):
-    fig = plt.figure(figsize=(18, 6))
-
-    # Time evolving
-    plt.subplot(1, 4, (1, 3))
-    time_edge_extrap = np.hstack(
-        (
-            stf_ds["time"].values[0] - (0.5 * np.diff(stf_ds["time"].values[0:2])),
-            stf_ds["time"].values[:-1] + (0.5 * np.diff(stf_ds["time"].values)),
-            stf_ds["time"].values[-1] + (0.5 * np.diff(stf_ds["time"].values[-2:])),
-        )
-    )
-    Z_edge_extrap = np.hstack(
-        (
-            np.array([0]),
-            stf_ds["Z"].values[:-1] + (0.5 * np.diff(stf_ds["Z"].values)),
-            np.array([-6134.5]),
-        )
-    )
-    plt.pcolormesh(time_edge_extrap, Z_edge_extrap, stf_ds[param].T)
-    plt.title("ECCOv4r4\nOverturning streamfunction across latitude %s [Sv]" % label)
-    plt.ylabel("Depth [m]")
-    plt.xlabel("Month")
-    plt.xticks(rotation=45)
-    cb = plt.colorbar()
-    cb.set_label("[Sv]")
-
-    plt.subplot(1, 4, 4)
-    plt.plot(stf_ds[param].mean("time"), stf_ds["Z"])
-    plt.title("ECCOv4r4\nTime mean streamfunction %s" % label)
-    plt.ylabel("Depth [m]")
-    plt.xlabel("[Sv]")
-    plt.grid()
-    plt.show()
-
-
-def plot_2D_streamfunction(stf_ds, title=None):
-    plt.figure(figsize=(10, 6))
-    plt.plot(stf_ds["time"], stf_ds["psi_moc"])
-    plt.xlabel("Time")
-    plt.ylabel("PSI in layer with maximal density level")
-    if title is None:
-        title = "PSI Streamfunction"
-    plt.title(title)
-    plt.grid(True)
-    plt.show()
-
-
 def get_gridllc0090_mask(target_latitude, longitudes, ds):
 
     FLIPPED_TILES = [7, 8, 9, 10, 11, 12, 13]
