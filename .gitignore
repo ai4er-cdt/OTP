@@ -7,3 +7,4 @@ ECCO/*
 *.ipynb_checkpoints/
 *.png
 *.pt
+*.idea/
