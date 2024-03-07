@@ -57,7 +57,7 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
             if ax == "time" and avg_time_window != None:
                 data = moving_average(data, avg_time_window)
             else:
-                data = data.mean(axis=coords.index(ax))
+                data = np.nanmean(data, axis=coords.index(ax))
             coords = [c for c in coords if c != ax]
 
     if history != None:
@@ -72,7 +72,7 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
     if verbose:
         print(f"axes: {coords + ['feature']}")
         print(f"variables: {data_vars}")
-        print(f"shape: {data.shape}")
+        print(f"shape: {data.shape}")    
     return t.Tensor(data) if return_pt else data
 
 def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
