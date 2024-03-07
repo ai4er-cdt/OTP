@@ -3,7 +3,9 @@
 # (it's not a great post to be honest but gives you the gist of it and includes useful references)
 
 from warnings import warn
+from typing import Optional
 import numpy as np
+import torch as t
 
 
 class ESN:
@@ -81,7 +83,8 @@ class ESN:
         return W
 
     def __init__(self, 
-                 n_input: int, 
+                 n_input: int,
+                 n_output: int, 
                  n_reservoir: int, 
                  input_mixing: str="none",
                  reservoir_mixing: str="random",
@@ -95,7 +98,8 @@ class ESN:
         Standard Echo State Network (reservoir computing) with leaky updating.
         See https://martinuzzifrancesco.github.io/posts/a-brief-introduction-to-reservoir-computing/ and references.
 
-        n_input: number of input signals (will also equal the number of output signals)
+        n_input: number of input signals
+        n_output: number of output signals (set equal to n_input for autoregressive capability)
         n_reservoir: size of the reservoir (hidden state)
         input_mixing: how to mix information between input signals - see init_W
         reservoir_mixing: how to mix information between hidden state signals - see init_W
@@ -119,24 +123,36 @@ class ESN:
         self.W = self.init_W(layer="reservoir", mixing=reservoir_mixing, sigma=1., p=p)
 
         # output weights are fit using the normal equations, we initialise now
-        self.W_out = np.zeros((n_input, n_reservoir))
+        self.W_out = np.zeros((n_output, n_reservoir))
 
-    def update(self, X: np.ndarray) -> np.ndarray:
+        # internal state
+        self.states = None
+        self.Y = None
+
+    def update(self, X: np.ndarray, Y: Optional[np.ndarray]=None) -> np.ndarray:
         states = [np.zeros(self.n_reservoir)]
         for u in X:
             prev_state = states[-1]
             cur_state = (1-self.alpha)*prev_state + self.alpha*np.tanh(self.W @ prev_state + self.W_in @ u)
             states.append(cur_state)
-        return np.array(states[1:])
+        states = np.array(states[1+self.warmup:])
+        if self.states is None:
+            self.states = states
+            if Y is not None: self.Y = Y[self.warmup:]
+        else:
+            if Y is None:
+                raise Exception("Y values not provided. Call fit or empty the reservoir!")
+            else:
+                self.states = np.vstack([self.states, states])
+                self.Y = np.concatenate([self.Y, Y[self.warmup:]])
 
-    def fit(self, X: np.ndarray, Y: np.ndarray):
-        states = self.update(X)
-        states = states[self.warmup:]
-        Y = Y[self.warmup:]
+    def fit(self):
         # solve the system Y = W_out @ states using the normal equations (regularised)
-        self.W_out = Y.T @ states @ np.linalg.inv(states.T @ states + self.beta*np.eye(self.n_reservoir))
+        self.W_out = self.Y.T @ self.states @ np.linalg.inv(self.states.T @ self.states + self.beta*np.eye(self.n_reservoir))
+        self.states = None; self.Y = None
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        states = self.update(X)
-        out = states @ self.W_out.T
+        self.update(X)
+        out = self.states @ self.W_out.T
+        self.states = None
         return out
