@@ -1,6 +1,7 @@
 import os
 from typing import Optional
-import SimDataset
+from models import SimDataset
+import numpy as np
 import torch as t
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -44,6 +45,7 @@ def train_model(model: nn.Module,
                 X_val: Optional[t.Tensor]=None,
                 y_val: Optional[t.Tensor]=None,
                 early_stopping: Optional[bool]=False,
+                patience: Optional[int]=500,
                 eval_iter: Optional[int]=None,
                 device: Optional[str]=None):
     
@@ -65,7 +67,7 @@ def train_model(model: nn.Module,
     criterion = nn.MSELoss()
     opt = t.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     train_loss = []; val_loss = []
-    if early_stopping: es = EarlyStopping(patience=100, min_delta = 0.01, threshold=2.25)
+    if early_stopping: es = EarlyStopping(patience=patience, min_delta = 0.01, threshold=2.25)
     if eval_iter is None:
         for iter in trange(max_iters):
             # use dataloader to sample a batch
@@ -82,7 +84,7 @@ def train_model(model: nn.Module,
                 loss = criterion(out.squeeze(-1), y_val.to(device)); val_loss.append(loss.item())
                 es(loss.item())
                 if es.early_stop: 
-                    print("early stopping")
+                    print(f"early stopping at {iter} iterations")
                     break
     else:
         for iter in range(max_iters):
@@ -105,9 +107,35 @@ def train_model(model: nn.Module,
                     print(f"Validation Loss: {loss.item()}")
                 es(loss.item())
                 if es.early_stop: 
-                    print("early stopping")
+                    print(f"early stopping at {iter} iterations")
                     break
     if validate:
         return model, train_loss, val_loss
     else:
-        return model. train_loss
+        return model, train_loss
+
+
+def predict(
+    model: nn.Module,
+    X: np.ndarray,
+    y: np.ndarray,
+    device: str | None = None,
+):
+
+    if device == None:
+        device = "cuda" if t.cuda.is_available() else "cpu"
+
+    # get training data
+    test_dataset = SimDataset.SimDataset(X, y, device)
+    test_DL = DataLoader(test_dataset, 1, shuffle=False)
+
+    y_pred = []
+
+    # training
+    model.eval()
+    with t.no_grad():
+        for x, y in test_DL:
+            outputs = model(x)
+            y_pred.extend(outputs.cpu().numpy())
+
+    return y_pred
