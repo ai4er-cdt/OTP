@@ -49,6 +49,7 @@ def train_model(model: nn.Module,
                 eval_iter: Optional[int]=None,
                 device: Optional[str]=None,
                 RAPID_dataset: Optional[bool]=False,
+                plot_loss: Optional[bool]=False,
                 ):
     
     if device == None: device = "cuda" if t.cuda.is_available() else "cpu"
@@ -116,6 +117,17 @@ def train_model(model: nn.Module,
                 if es.early_stop: 
                     print(f"early stopping at {iter} iterations")
                     break
+
+    if plot_loss is True:
+        fig, ax = plt.subplots(figsize=(10, 3))
+        ax.plot(train_loss, linestyle="--", color="red", alpha=0.5)
+        ax.plot(val_loss, linestyle="--", color="orange", alpha=0.5)
+        ax.set_ylabel("MSE")
+        ax.set_xlabel("Training Step")
+        ax.set_title(f"{name}: Loss")
+        plt.show()
+        plt.close()
+
     if validate:
         return model, train_loss, val_loss
     else:
