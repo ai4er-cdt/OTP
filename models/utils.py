@@ -154,6 +154,8 @@ def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_se
 
         # Adding back in latitude dimension that got squeezed out
         if mode == 'inputs' and 'latitude' in dataset.dims:
+            if new_var.ndim == 1:
+                new_var = new_var.reshape(-1, 1)
             new_var = new_var.reshape(new_var.shape[0], 1, new_var.shape[1])
         elif mode == 'outputs' and 'latitude' in dataset.dims:
             new_var = new_var.reshape(new_var.shape[0], 1)

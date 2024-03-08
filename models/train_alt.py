@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from models import SimDataset
+from models import SimDataset, RAPIDDataset
 import numpy as np
 import torch as t
 import torch.nn as nn
@@ -15,7 +15,7 @@ t.manual_seed(123456)
 
 # default hyperparameters
 batch_size = 32
-max_iters = 5000 
+max_iters = 5000
 lr = 1e-3
 weight_decay = 1e-5
 # ---------------
@@ -47,7 +47,9 @@ def train_model(model: nn.Module,
                 early_stopping: Optional[bool]=False,
                 patience: Optional[int]=500,
                 eval_iter: Optional[int]=None,
-                device: Optional[str]=None):
+                device: Optional[str]=None,
+                RAPID_dataset: Optional[bool]=False,
+                ):
     
     if device == None: device = "cuda" if t.cuda.is_available() else "cpu"
     model = model.to(device)
@@ -56,7 +58,10 @@ def train_model(model: nn.Module,
     print(f"{sum([p.numel() for p in model.parameters()])} parameters.")
         
     # get training data
-    train_dataset = SimDataset.SimDataset(X_train, y_train, device)
+    if RAPID_dataset is True:
+        train_dataset = RAPIDDataset.RAPIDDataset(X_train, y_train, device)
+    else:
+        train_dataset = SimDataset.SimDataset(X_train, y_train, device)
     train_DL = DataLoader(train_dataset, batch_size, shuffle=True)
     data_iterator = cycle(train_DL)
 
@@ -120,14 +125,19 @@ def predict(
     X: np.ndarray,
     y: np.ndarray,
     device: str | None = None,
+    RAPID_dataset: Optional[bool]=False,
 ):
 
     if device == None:
         device = "cuda" if t.cuda.is_available() else "cpu"
 
     # get training data
-    test_dataset = SimDataset.SimDataset(X, y, device)
+    if RAPID_dataset is True:
+        test_dataset = RAPIDDataset.RAPIDDataset(X, y, device)
+    else:
+        test_dataset = SimDataset.SimDataset(X, y, device)
     test_DL = DataLoader(test_dataset, 1, shuffle=False)
+    data_iterator = cycle(test_DL)
 
     y_pred = []
 
