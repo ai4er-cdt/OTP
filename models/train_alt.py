@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from models import SimDataset, RAPIDDataset
+from models import SimDataset
 import numpy as np
 import torch as t
 import torch.nn as nn
@@ -15,13 +15,13 @@ t.manual_seed(123456)
 
 # default hyperparameters
 batch_size = 32
-max_iters = 5000
+max_iters = 5000 
 lr = 1e-3
 weight_decay = 1e-5
 # ---------------
 
 class EarlyStopping:
-    def __init__(self, patience: int=80, min_delta: float=0, threshold: float=float("inf")):
+    def __init__(self, patience: int=5, min_delta: int=0, threshold: float=float("inf")):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
@@ -45,11 +45,9 @@ def train_model(model: nn.Module,
                 X_val: Optional[t.Tensor]=None,
                 y_val: Optional[t.Tensor]=None,
                 early_stopping: Optional[bool]=False,
+                patience: Optional[int]=500,
                 eval_iter: Optional[int]=None,
-                device: Optional[str]=None,
-                RAPID_dataset: Optional[bool]=False,
-                plot_loss: Optional[bool]=False,
-                ):
+                device: Optional[str]=None):
     
     if device == None: device = "cuda" if t.cuda.is_available() else "cpu"
     model = model.to(device)
@@ -58,10 +56,7 @@ def train_model(model: nn.Module,
     print(f"{sum([p.numel() for p in model.parameters()])} parameters.")
         
     # get training data
-    if RAPID_dataset is True:
-        train_dataset = RAPIDDataset.RAPIDDataset(X_train, y_train, device)
-    else:
-        train_dataset = SimDataset.SimDataset(X_train, y_train, device)
+    train_dataset = SimDataset.SimDataset(X_train, y_train, device)
     train_DL = DataLoader(train_dataset, batch_size, shuffle=True)
     data_iterator = cycle(train_DL)
 
@@ -72,12 +67,11 @@ def train_model(model: nn.Module,
     criterion = nn.MSELoss()
     opt = t.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     train_loss = []; val_loss = []
-    if early_stopping: es = EarlyStopping(min_delta = 0.01, threshold=2.25)
+    if early_stopping: es = EarlyStopping(patience=patience, min_delta = 0.01, threshold=2.25)
     if eval_iter is None:
         for iter in trange(max_iters):
             # use dataloader to sample a batch
             x, y = next(data_iterator)
-            x = x.float(); y = y.float()
             # update model
             out = model(x)
             loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
@@ -86,7 +80,6 @@ def train_model(model: nn.Module,
             opt.step()
 
             if validate:
-                X_val = X_val.float(); y_val = y_val.float()
                 out = model(X_val.to(device))
                 loss = criterion(out.squeeze(-1), y_val.to(device)); val_loss.append(loss.item())
                 es(loss.item())
@@ -97,7 +90,6 @@ def train_model(model: nn.Module,
         for iter in range(max_iters):
             # use dataloader to sample a batch
             x, y = next(data_iterator)
-            x = x.float(); y = y.float()
             # update model
             out = model(x)
             loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
@@ -109,7 +101,6 @@ def train_model(model: nn.Module,
                 print(f"Training Loss: {loss.item()}")
 
             if validate:
-                X_val = X_val.float(); y_val = y_val.float()
                 out = model(X_val.to(device))
                 loss = criterion(out.squeeze(-1), y_val.to(device)); val_loss.append(loss.item())
                 if iter % eval_iter == 0:
@@ -118,17 +109,6 @@ def train_model(model: nn.Module,
                 if es.early_stop: 
                     print(f"early stopping at {iter} iterations")
                     break
-
-    if plot_loss is True:
-        fig, ax = plt.subplots(figsize=(10, 3))
-        ax.plot(train_loss, linestyle="--", color="red", alpha=0.5)
-        ax.plot(val_loss, linestyle="--", color="orange", alpha=0.5)
-        ax.set_ylabel("MSE")
-        ax.set_xlabel("Training Step")
-        ax.set_title(f"{name}: Loss")
-        plt.show()
-        plt.close()
-
     if validate:
         return model, train_loss, val_loss
     else:
@@ -140,19 +120,14 @@ def predict(
     X: np.ndarray,
     y: np.ndarray,
     device: str | None = None,
-    RAPID_dataset: Optional[bool]=False,
 ):
 
     if device == None:
         device = "cuda" if t.cuda.is_available() else "cpu"
 
     # get training data
-    if RAPID_dataset is True:
-        test_dataset = RAPIDDataset.RAPIDDataset(X, y, device)
-    else:
-        test_dataset = SimDataset.SimDataset(X, y, device)
+    test_dataset = SimDataset.SimDataset(X, y, device)
     test_DL = DataLoader(test_dataset, 1, shuffle=False)
-    data_iterator = cycle(test_DL)
 
     y_pred = []
 
