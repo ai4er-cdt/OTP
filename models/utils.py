@@ -71,7 +71,7 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
     if verbose:
         print(f"axes: {coords + ['feature']}")
         print(f"variables: {data_vars}")
-        print(f"shape: {data.shape}")    
+        print(f"shape: {data.shape}")
     return t.Tensor(data) if return_pt else data
 
 def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
