@@ -21,7 +21,7 @@ class ConvBlock(nn.Module):
                  n_channels: int,
                  kernel_size: int|Tuple[int, int],
                  n_layers: int,
-                 dropout: int):
+                 dropout: float):
         super().__init__()
         self.n_layers = n_layers
         n_groups = n_features if is_pure else 1
@@ -36,15 +36,15 @@ class ConvBlock(nn.Module):
         if self.n_layers > 1:
             self.layers = nn.Sequential(
                 *[
-                    nn.Conv2d(in_channels=n_channels,
+                    nn.Sequential(nn.Conv2d(in_channels=n_channels,
                               out_channels=n_channels,
                               kernel_size=kernel_size,
                               padding="same",
                               groups=n_groups),
                     nn.BatchNorm2d(n_channels),
                     nn.GELU(),
-                    nn.Dropout(dropout)
-                ]*(n_layers-1)
+                    nn.Dropout(dropout)) for _ in range(n_layers-1)
+                ]
             )
 
     def forward(self, x) -> Any:
@@ -62,7 +62,7 @@ class CNN2D(nn.Module):
                  n_features: int,
                  n_channels: int,
                  kernel_size: int|Tuple[int, int],
-                 dropout: int):
+                 dropout: float):
         super().__init__()
 
         self.use_pure = n_pure_layers > 0
