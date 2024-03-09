@@ -14,6 +14,7 @@ n_channels = n_features * 5
 kernel_size = 5
 # ---------------
 
+
 class ConvBlock(nn.Module):
     def __init__(self, 
                  is_pure: bool,
@@ -54,6 +55,36 @@ class ConvBlock(nn.Module):
         x = self.init_dpout(x)
         if self.n_layers > 1: x = self.layers(x)
         return x
+
+"""""
+class ConvBlock(nn.Module):
+    def __init__(self, is_pure: bool, n_features: int, n_channels: int, kernel_size: int, n_layers: int,
+                 dropout: float):
+        super().__init__()
+        layers = [
+            nn.Conv1d(in_channels=n_features, out_channels=n_channels, kernel_size=kernel_size, padding="same",
+                      groups=n_features if is_pure else 1),
+            nn.BatchNorm1d(n_channels),
+            nn.GELU(),
+            nn.Dropout(dropout)
+        ]
+
+        # For additional layers, create new instances for each layer
+        for _ in range(1, n_layers):
+            layers += [
+                nn.Conv1d(in_channels=n_channels, out_channels=n_channels, kernel_size=kernel_size, padding="same",
+                          groups=n_features if is_pure else 1),
+                nn.BatchNorm1d(n_channels),
+                nn.GELU(),
+                nn.Dropout(dropout)
+            ]
+
+        self.layers = nn.Sequential(*layers)
+
+    def forward(self, x):
+        return self.layers(x)
+"""
+
 
 class CNN1D(nn.Module):
     def __init__(self,
