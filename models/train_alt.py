@@ -21,7 +21,7 @@ weight_decay = 1e-5
 # ---------------
 
 class EarlyStopping:
-    def __init__(self, patience: int=5, min_delta: int=0, threshold: float=float("inf")):
+    def __init__(self, patience: int=5, min_delta: float=0, threshold: float=float("inf")):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
@@ -45,7 +45,6 @@ def train_model(model: nn.Module,
                 X_val: Optional[t.Tensor]=None,
                 y_val: Optional[t.Tensor]=None,
                 early_stopping: Optional[bool]=False,
-                patience: Optional[int]=500,
                 eval_iter: Optional[int]=None,
                 device: Optional[str]=None,
                 RAPID_dataset: Optional[bool]=False,
@@ -67,13 +66,14 @@ def train_model(model: nn.Module,
     data_iterator = cycle(train_DL)
 
     validate = X_val is not None
+    print(validate)
 
     # training
     model.train()
     criterion = nn.MSELoss()
     opt = t.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     train_loss = []; val_loss = []
-    if early_stopping: es = EarlyStopping(patience=patience, min_delta = 0.01, threshold=2.25)
+    if early_stopping: es = EarlyStopping(min_delta = 0.01, threshold=2.25)
     if eval_iter is None:
         for iter in trange(max_iters):
             # use dataloader to sample a batch
