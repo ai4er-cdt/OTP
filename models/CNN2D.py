@@ -56,47 +56,6 @@ class ConvBlock(nn.Module):
         return x
 
 
-class ConvBlock(nn.Module):
-    def __init__(self,
-                 is_pure: bool,
-                 n_features: int,
-                 n_channels: int,
-                 kernel_size: int,
-                 n_layers: int,
-                 dropout: int):
-        super().__init__()
-        self.n_layers = n_layers
-        n_groups = n_features if is_pure else 1
-
-        self.init_conv = nn.Conv1d(in_channels=n_features,
-                                   out_channels=n_channels,
-                                   kernel_size=kernel_size,
-                                   padding="same",
-                                   groups=n_groups)
-        self.init_BN = nn.BatchNorm1d(n_channels)
-        self.init_dpout = nn.Dropout(dropout)
-        if self.n_layers > 1:
-            self.layers = nn.Sequential(
-                *[
-                     nn.Conv1d(in_channels=n_channels,
-                               out_channels=n_channels,
-                               kernel_size=kernel_size,
-                               padding="same",
-                               groups=n_groups),
-                     nn.BatchNorm1d(n_channels),
-                     nn.GELU(),
-                     nn.Dropout(dropout)
-                 ] * (n_layers - 1)
-            )
-
-    def forward(self, x) -> Any:
-        x = self.init_conv(x)
-        x = self.init_BN(x)
-        x = F.gelu(x)
-        x = self.init_dpout(x)
-        if self.n_layers > 1: x = self.layers(x)
-        return x
-    
 class CNN2D(nn.Module):
     def __init__(self,
                  n_pure_layers: int,
