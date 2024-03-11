@@ -128,7 +128,7 @@ class CNNRAPID(nn.Module):
         self.conv1d_x2 = nn.Conv1d(in_channels=n_second_input_features, out_channels=3, kernel_size=3)
 
         # Adjust the linear layer to accommodate the concatenated output from conv layers and 1D input
-        self.fc = nn.Linear(c * n_channels + 12, 1)
+        self.fc = nn.Linear(c * n_channels + 3, 1)
 
     def forward(self, x) -> Any:
         # x1 is the input for convolutional blocks
