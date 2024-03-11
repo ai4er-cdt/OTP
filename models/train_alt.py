@@ -21,7 +21,7 @@ weight_decay = 1e-5
 # ---------------
 
 class EarlyStopping:
-    def __init__(self, patience: int=5, min_delta: float=0, threshold: float=float("inf")):
+    def __init__(self, patience: int=80, min_delta: float=0, threshold: float=float("inf")):
         self.patience = patience
         self.min_delta = min_delta
         self.counter = 0
@@ -66,7 +66,6 @@ def train_model(model: nn.Module,
     data_iterator = cycle(train_DL)
 
     validate = X_val is not None
-    print(validate)
 
     # training
     model.train()
@@ -87,6 +86,7 @@ def train_model(model: nn.Module,
             opt.step()
 
             if validate:
+                X_val = X_val.float(); y_val = y_val.float()
                 out = model(X_val.to(device))
                 loss = criterion(out.squeeze(-1), y_val.to(device)); val_loss.append(loss.item())
                 es(loss.item())
@@ -109,6 +109,7 @@ def train_model(model: nn.Module,
                 print(f"Training Loss: {loss.item()}")
 
             if validate:
+                X_val = X_val.float(); y_val = y_val.float()
                 out = model(X_val.to(device))
                 loss = criterion(out.squeeze(-1), y_val.to(device)); val_loss.append(loss.item())
                 if iter % eval_iter == 0:

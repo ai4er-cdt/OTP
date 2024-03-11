@@ -108,7 +108,7 @@ def pred_vs_actual(train_pred, test_pred, train_label, test_label, numerical_mod
     return fig, ax
 
 
-def plot_depth_stf_vs_time(stf_ds, label, param):
+def plot_depth_stf_vs_time(stf_ds, label, param, min_value=0, max_value=-6134.5):
     """
         Plotting the streamfunction over a depth space over time as well as the time mean streamfunction.
 
@@ -139,9 +139,9 @@ def plot_depth_stf_vs_time(stf_ds, label, param):
     )
     Z_edge_extrap = np.hstack(
         (
-            np.array([0]),
+            np.array([min_value]),
             stf_ds["Z"].values[:-1] + (0.5 * np.diff(stf_ds["Z"].values)),
-            np.array([-6134.5]),
+            np.array([max_value]),
         )
     )
     plt.pcolormesh(time_edge_extrap, Z_edge_extrap, stf_ds[param].T)
@@ -155,6 +155,7 @@ def plot_depth_stf_vs_time(stf_ds, label, param):
     plt.subplot(1, 4, 4)
     plt.plot(stf_ds[param].mean("time"), stf_ds["Z"])
     plt.title("ECCOv4r4\nTime mean streamfunction %s" % label)
+    plt.ylim(min(max_value, min_value), max(min_value, max_value))
     plt.ylabel("Depth [m]")
     plt.xlabel("[Sv]")
     plt.grid()
