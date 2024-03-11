@@ -1,8 +1,6 @@
 import numpy as np
 import xarray as xr
 import matplotlib.pyplot as plt
-
-
 def get_gridllc0090_mask(ds, target_latitude, longitudes):
     FLIPPED_TILES = [7, 8, 9, 10, 11, 12, 13]
 
@@ -52,15 +50,3 @@ def get_gridllc0090_mask(ds, target_latitude, longitudes):
         # Update the mask DataArray for the current face
         mask.loc[dict(tile=tile_num)] = zeros.astype(int)
     return mask
-
-
-def plot_2D_streamfunction(stf_ds, moc_param="psi_moc", title=None):
-    plt.figure(figsize=(10, 6))
-    plt.plot(stf_ds["time"], stf_ds[moc_param])
-    plt.xlabel("Time")
-    plt.ylabel("PSI in layer with maximal density level")
-    if title is None:
-        title = "PSI Streamfunction"
-    plt.title(title)
-    plt.grid(True)
-    plt.show()

@@ -3,7 +3,7 @@ import config
 
 LOCAL_DIR = config.LOCAL_DIR
 
-SOLODOCH_DATA = os.path.join(LOCAL_DIR, "ecco_data_full")
+SOLODOCH_DATA = os.path.join(LOCAL_DIR, "solodoch_data_full")
 
 geom_fp = os.path.join(
     SOLODOCH_DATA,
