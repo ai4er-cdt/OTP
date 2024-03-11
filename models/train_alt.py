@@ -77,7 +77,8 @@ def train_model(model: nn.Module,
         for iter in trange(max_iters):
             # use dataloader to sample a batch
             x, y = next(data_iterator)
-            #x = x.float(); y = y.float()
+            if RAPID_dataset is False:
+                x = x.float(); y = y.float()
             # update model
             out = model(x)
             loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
@@ -97,7 +98,8 @@ def train_model(model: nn.Module,
         for iter in range(max_iters):
             # use dataloader to sample a batch
             x, y = next(data_iterator)
-            #x = x.float(); y = y.float()
+            if RAPID_dataset is False:
+                x = x.float(); y = y.float()
             # update model
             out = model(x)
             loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
