@@ -280,26 +280,3 @@ def custom_MAPE(y_test, y_pred, threshold = 0, return_num_discarded = False):
         return mape, initial_len - new_len
 
     return mape
-
-if __name__ == '__main__':
-    data_home = "/Users/emiliolr/Google Drive/My Drive/GTC"
-    lats = ["26N", "30S", "55S", "60S"]
-    lat = lats[3]
-    inputs = xr.open_dataset(f"{data_home}/ecco_data_minimal/{lat}.nc")
-    inputs = inputs.sel(latitude = -59.75) # pull out just 60S
-
-    remove_season = False
-    remove_trend = False
-
-    pp_data = apply_preprocessing(inputs,
-                                  mode="inputs",
-                                  remove_season=remove_season,
-                                  remove_trend=remove_trend,
-                                  standardize=True,
-                                  lowpass=False)
-
-    for data_var in pp_data:
-        print(data_var)
-        print(pp_data[data_var].shape)
-        print(pp_data[data_var].mean(axis = 0).values.shape, pp_data[data_var].std(axis = 0).values.shape)
-        print()
