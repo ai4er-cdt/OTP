@@ -286,8 +286,8 @@ if __name__ == '__main__':
     inputs = xr.open_dataset(f"{data_home}/ecco_data_minimal/{lat}.nc")
     inputs = inputs.sel(latitude = -59.75) # pull out just 60S
 
-    remove_season = True
-    remove_trend = True
+    remove_season = False
+    remove_trend = False
 
     pp_data = apply_preprocessing(inputs,
                                   mode="inputs",
@@ -296,4 +296,8 @@ if __name__ == '__main__':
                                   standardize=True,
                                   lowpass=False)
 
-    print(pp_data)
+    for data_var in pp_data:
+        print(data_var)
+        print(pp_data[data_var].shape)
+        print(pp_data[data_var].mean(axis = 0).values.shape, pp_data[data_var].std(axis = 0).values.shape)
+        print()
