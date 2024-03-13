@@ -2,8 +2,7 @@ import os
 import paths
 import xarray as xr
 
-from streamfunction_ecco import streamfunction_ecco_utils as strf_ecco_utils
-from streamfunction_ecco import streamfunction_custom_utils as strf_custom_utils
+from scripts.archive import streamfunction_LLC0090_utils as strf_ecco_utils, LLC0090_masking as strf_custom_utils
 
 
 def calculate_streamfunction(

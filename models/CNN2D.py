@@ -54,7 +54,8 @@ class ConvBlock(nn.Module):
         x = self.init_dpout(x)
         if self.n_layers > 1: x = self.layers(x)
         return x
-    
+
+
 class CNN2D(nn.Module):
     def __init__(self,
                  n_pure_layers: int,

@@ -13,7 +13,6 @@ import statsmodels.api as sm
 from datetime import datetime
 from scipy.io import loadmat
 from scipy.signal import gaussian, convolve, butter, lfilter
-from scipy.interpolate import griddata
 from sklearn.linear_model import LinearRegression, LassoCV, HuberRegressor
 
 from keras.models import Sequential
