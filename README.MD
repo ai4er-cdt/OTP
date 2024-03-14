@@ -2,14 +2,54 @@
 
 [![DOI](https://zenodo.org/badge/735913470.svg)](https://zenodo.org/doi/10.5281/zenodo.10817670) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Overview
+## Project Description
 
-## Repository Setup
+## Environment Setup
 
 1. Clone this repository using `git clone --recursive <HTTPS or SSH>` to ensure the ECCO submodule is loaded as well.
 2. Edit the `environment.yml` file to include your own local filepath for your conda environments. See comment in file for further instructions.
 3. Create your conda python environment using `conda env create -f environment.yml` and activate the environment with `conda activate gtc`.
 4. Make sure you can run the first cell of `sandbox.ipynb`--this ensures that the ECCO package is loaded correctly and all dependencies have been installed to your python environment. If using VSCode, be sure to set your kernel to the `gtc` conda environment.
+
+## Repository Overview
+
+### `scripts/`
+
+This directory contains all Python scripts used for data download and preprocessing.
+
+- `basin_masks.py`:
+- `download_ecco.py`:
+- `ecco_download.py`:
+- `streamfunction_latlon.py`:
+
+### `models/`
+
+This directory contains all machine learning model definitions (mostly different forms of neural networks), PyTorch dataset class definitions, model training loops, and utility functions for use during modelling.
+
+**Model definitions:**
+- `MLP.py`:
+- `SOLODOCH.py`:
+- `CNN1D.py`:
+- `CNN2D.py`:
+- `CNN3D.py`:
+- `CNN_RAPID.py`:
+- `ESN.py`
+
+**PyTorch dataset definitions:**
+- `RAPIDDataset`:
+- `SimDataset.py`:
+
+**Utility functions:**
+- `utils.py`:
+- `plotting_utils.py`:
+
+**Model training loops:**
+- `train.py`:
+- `train_alt.py`:
+
+### `notebooks/`
+
+### `ACCESS/`
 
 ## Acknowledgements
 
