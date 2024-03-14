@@ -28,7 +28,7 @@
 
 <table>
   <tr>
-    <td><img src="assets/ninab.png" alt="Nina Baranduin" style="border-radius: 50%; width: 50px; height: 50px;"></td>
+    <td><img src="assets/ninab.png" alt="Nina Baranduin" style="border-radius: 50%; width: 80px; height: 80px;"></td>
     <td><a href="mailto:ngb34@cam.ac.uk">Nina Baranduin</a></td>
     <td><img src="assets/tomc.png" alt="Tom Cowperthwaite" style="border-radius: 50%; width: 50px; height: 50px;"></td>
     <td><a href="mailto:tc656@cam.ac.uk">Tom Cowperthwaite</a></td>
