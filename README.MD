@@ -2,7 +2,7 @@
 
 <p align="middle">
   <img src="assets/ai4er_logo.png" width="15%" />
-  <img src="assets/cambridge_logo.jpg" width="56%" /> 
+  <img src="assets/cambridge_logo.png" width="56%" /> 
 </p>
 
 -----
