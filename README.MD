@@ -48,6 +48,6 @@ If you use the code in this repository, please consider citing it--see the [`cit
 -----
 
 <p align="middle">
-  <img src="assets/ai4er_logo.png" width="15%" />
-  <img src="assets/cambridge_logo.png" width="56%" /> 
+  <img src="assets/ai4er_logo.png" width="15%" href="https://ai4er-cdt.esc.cam.ac.uk/"/>
+  <img src="assets/cambridge_logo.png" width="56%" href="https://www.cam.ac.uk/"/> 
 </p>
