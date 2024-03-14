@@ -1,7 +1,7 @@
 # AI4ER Guided Team Challenge 2024
 
 <p align="middle">
-  <img src="assets/ai4er_logo.png" width="30%" />
+  <img src="assets/ai4er_logo.png" width="10%" />
   <img src="assets/cambridge_logo.jpg" width="60%" /> 
 </p>
 
