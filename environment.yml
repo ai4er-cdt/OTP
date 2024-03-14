@@ -22,4 +22,5 @@ dependencies:
   - conda-forge::geopy
   - gsw
   - conda-forge::ffmpeg
-prefix: /home/maish/miniconda3/envs/gtc
+  - conda-forge::jupyterlab
+prefix: /home/maish/miniconda3/envs/gtc # REMEMBER: replace this with the filepath to your conda environments!
