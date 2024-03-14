@@ -46,6 +46,6 @@
 
 -----
 
-## License and Repository
+## License and Citation
 
 If you use the code in this repository, please consider citing it--see the [`citation.cff`](citation.cff) file or use the "Cite this repository" function on the right sidebar. All code is under the MIT license--see the [`LICENSE`](LICENSE) file.
