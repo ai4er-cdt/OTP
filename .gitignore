@@ -8,4 +8,4 @@ ECCO/*
 *.png
 *.pt
 *.idea/
-!assets/*
+!assets/*.png
