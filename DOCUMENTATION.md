@@ -14,8 +14,8 @@ To run the project locally, we recommend you set up your environment using [`con
    - If you're not sure what this filepath is, you can check using `conda info --envs`. The filepath should be `[FILEPATH FOR BASE ENVIRONMENT]/envs/gtc`. Notice that this ends in `gtc`--this will be the name of the created `conda` environment.
 4. Create your `conda` Python environment using `conda env create -f environment.yml`.
 5. Activate the environment with `conda activate gtc`.
-6. Make sure you can run the first cell of `setup_verification.ipynb`--this ensures that the ECCO package is loaded correctly and all dependencies have been installed to your python environment.
-   - `jupyter-lab` will be installed in the created `conda` environment, so you can run this notebook by spinning up Jupyter Lab (input the `jupyter-lab` command on the command line while in the project directory) and opening the notebook. Be sure you activate the `gtc` environment before opening Jupyter Lab.
+6. Make sure you can run the first code cell of `setup_verification.ipynb` in the main project directory--this ensures that the ECCO submodule has been downloaded correctly and that all dependencies have been installed to your Python environment.
+   - `jupyter-lab` will be installed in the newly created environment, so you can run this notebook by spinning up Jupyter Lab (input the `jupyter-lab` command on the command line while in the project directory) and opening the notebook. Be sure you activate the `gtc` environment before opening Jupyter Lab.
    - If using VSCode to run this notebook, be sure to set your kernel to the `gtc` conda environment.
 
 ## Repository Overview
@@ -47,7 +47,7 @@ This directory contains all machine learning model definitions (mostly different
 - `ESN.py`
 
 **PyTorch dataset definitions:**
-- `RAPIDDataset`:
+- `RAPIDDataset.py`:
 - `SimDataset.py`:
 
 **Utility functions:**
