@@ -1,5 +1,7 @@
 # AI4ER Guided Team Challenge 2024
 
+[![DOI](https://zenodo.org/badge/735913470.svg)](https://zenodo.org/doi/10.5281/zenodo.10817670) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 <p align="middle">
   <img src="assets/ai4er_logo.png" width="15%" />
   <img src="assets/cambridge_logo.png" width="56%" /> 
