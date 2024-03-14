@@ -11,11 +11,9 @@
 3. Create your conda python environment using `conda env create -f environment.yml` and activate the environment with `conda activate gtc`.
 4. Make sure you can run the first cell of `sandbox.ipynb`--this ensures that the ECCO package is loaded correctly and all dependencies have been installed to your python environment. If using VSCode, be sure to set your kernel to the `gtc` conda environment.
 
-## Data Availability
-
-## License
-
 ## Acknowledgements
+
+We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and Alberto Naveira Garabato--as well as our project mentors--Josh Lanham and Kate Oglethorpe. Their guidance throughout was instrumental in our success as a team. We would also like to thank the AI4ER support staff--Annabelle Scott and Adriana Dote--for their help navigating the complex logistics of the Guided Team Challenge.
 
 -----
 
@@ -44,6 +42,10 @@
 ## License and Citation
 
 If you use the code in this repository, please consider citing it--see the [`citation.cff`](citation.cff) file or use the "Cite this repository" function on the right sidebar. All code is under the MIT license--see the [`LICENSE`](LICENSE) file.
+
+## Data Availability
+
+-----
 
 <p align="middle">
   <img src="assets/ai4er_logo.png" width="15%" />
