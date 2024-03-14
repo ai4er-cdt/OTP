@@ -57,47 +57,6 @@ class ConvBlock(nn.Module):
         return x
 
 
-class ConvBlock1D(nn.Module):
-    def __init__(self,
-                 is_pure: bool,
-                 n_features: int,
-                 n_channels: int,
-                 kernel_size: int,
-                 n_layers: int,
-                 dropout: int):
-        super().__init__()
-        self.n_layers = n_layers
-        n_groups = n_features if is_pure else 1
-
-        self.init_conv = nn.Conv1d(in_channels=n_features,
-                                   out_channels=n_channels,
-                                   kernel_size=kernel_size,
-                                   padding="same",
-                                   groups=n_groups)
-        self.init_BN = nn.BatchNorm1d(n_channels)
-        self.init_dpout = nn.Dropout(dropout)
-        if self.n_layers > 1:
-            self.layers = nn.Sequential(
-                *[
-                     nn.Conv1d(in_channels=n_channels,
-                               out_channels=n_channels,
-                               kernel_size=kernel_size,
-                               padding="same",
-                               groups=n_groups),
-                     nn.BatchNorm1d(n_channels),
-                     nn.GELU(),
-                     nn.Dropout(dropout)
-                 ] * (n_layers - 1)
-            )
-
-    def forward(self, x) -> Any:
-        x = self.init_conv(x)
-        x = self.init_BN(x)
-        x = F.gelu(x)
-        x = self.init_dpout(x)
-        if self.n_layers > 1: x = self.layers(x)
-        return x
-
 class CNNRAPID(nn.Module):
     def __init__(self,
                  n_pure_layers: int,
@@ -123,12 +82,12 @@ class CNNRAPID(nn.Module):
         if c == 0:
             raise Exception("No layers! n_pure_layers and/or n_mix_layers must be > 0.")
 
-        #self.process_x2 = nn.Linear(n_second_input_features, n_channels)
-        #self.conv1d_x2 = ConvBlock1D(True, n_features, 1, kernel_size[0], n_pure_layers, dropout)
-        self.conv1d_x2 = nn.Conv1d(in_channels=n_second_input_features, out_channels=3, kernel_size=3)
+        self.conv1d_x2 = nn.Conv1d(in_channels=n_second_input_features, out_channels=n_channels, kernel_size=3)
+
+        print('channels', c*n_channels)
 
         # Adjust the linear layer to accommodate the concatenated output from conv layers and 1D input
-        self.fc = nn.Linear(c * n_channels + 3, 1)
+        self.fc = nn.Linear(c * n_channels + 15, 1)
 
     def forward(self, x) -> Any:
         # x1 is the input for convolutional blocks
@@ -153,13 +112,15 @@ class CNNRAPID(nn.Module):
         out = F.avg_pool2d(out, out.shape[-2:]).squeeze()
 
         # Process x2 if additional processing is beneficial.
-        #x2_processed = self.process_x2(x2)
         x2 = x2.transpose(1, 2)
+
         x2_processed = self.conv1d_x2(x2)
-        x2_processed = x2_processed.reshape(x2_processed.size(0), -1)
+        x2_processed = x2_processed.reshape(x2_processed.size(0), -1).squeeze()
 
         if out.dim() == 1:
             out = out.unsqueeze(0)
+        if x2_processed.dim() == 1:
+            x2_processed = x2_processed.unsqueeze(0)
 
         # Concatenate the 1D input with the output from convolutional blocks
         out = t.cat((out, x2_processed), dim=1)
