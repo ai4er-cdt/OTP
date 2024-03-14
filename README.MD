@@ -6,6 +6,10 @@
 
 **TODO: fill this section in!**
 
+## Documentation
+
+Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository.
+
 ## Acknowledgements
 
 We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and Alberto Naveira Garabato--as well as our project mentors--Josh Lanham and Kate Oglethorpe. Their guidance throughout was instrumental in our success as a team. We would also like to thank the AI4ER support staff--Annabelle Scott and Adriana Dote--for their help navigating the complex logistics of the Guided Team Challenge.
