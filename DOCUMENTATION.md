@@ -11,7 +11,7 @@ To run the project locally, we recommend you set up your environment using [`con
 1. Clone this repository using `git clone --recursive <HTTPS or SSH>` to ensure the ECCO submodule is loaded as well.
 2. Navigate to the newly created repository directory (i.e., use `cd OTP`).
 3. Edit the `environment.yml` file to include your own local filepath for your `conda` environments.
-   - If you're not sure what this filepath is, you can check using `conda info --envs`. The filepath should be `[FILEPATH FOR BASE ENVIRONMENT]/envs/gtc`. Notice that this ends in `gtc`--this will be the name of the created `conda` environment.
+   - If you're not sure what this filepath is, you can check using `conda info --envs`. The filepath should be `[FILEPATH FOR BASE ENVIRONMENT]/envs/`. Notice that this ends in `gtc`--this will be the name of the created `conda` environment.
 4. Create your `conda` Python environment using `conda env create -f environment.yml`.
 5. Activate the environment with `conda activate gtc`.
 6. Make sure you can run the first code cell of `setup_verification.ipynb` in the main project directory--this ensures that the ECCO submodule has been downloaded correctly and that all dependencies have been installed to your Python environment.
