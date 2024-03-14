@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Luz-Ricca"
+  given-names: "Emilio"
+  orcid: "https://orcid.org/0000-0002-4180-4123"
+- family-names: "Baranduin"
+  given-names: "Nina"
+- family-names: "Cowperthwaite"
+  given-names: "Thomas"
+- family-names: "Maiya"
+  given-names: "Sharan"
+- family-names: "Van Driessche"
+  given-names: "Aline"
+title: "OTP"
+version: 1.0
+// doi: 10.5281/zenodo.1234
+date-released: 2024-03-14
+url: "https://github.com/ai4er-cdt/OTP"
