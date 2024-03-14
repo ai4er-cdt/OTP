@@ -30,15 +30,15 @@
   <tr>
     <td><img src="assets/ninab.png" alt="Nina Baranduin" style="border-radius: 50%; width: 80px; height: 80px;"></td>
     <td><a href="mailto:ngb34@cam.ac.uk">Nina Baranduin</a></td>
-    <td><img src="assets/tomc.png" alt="Tom Cowperthwaite" style="border-radius: 50%; width: 50px; height: 50px;"></td>
+    <td><img src="assets/tomc.png" alt="Tom Cowperthwaite" style="border-radius: 50%; width: 80px; height: 80px;"></td>
     <td><a href="mailto:tc656@cam.ac.uk">Tom Cowperthwaite</a></td>
-    <td><img src="assets/emiliolr.png" alt="Emilio Luz-Ricca" style="border-radius: 50%; width: 50px; height: 50px;"></td>
+    <td><img src="assets/emiliolr.png" alt="Emilio Luz-Ricca" style="border-radius: 50%; width: 80px; height: 80px;"></td>
     <td><a href="mailto:el590@cam.ac.uk">Emilio Luz-Ricca</a></td>
   </tr>
   <tr>
-    <td><img src="assets/sharanm.png" alt="Sharan Maiya" style="border-radius: 50%; width: 50px; height: 50px;"></td>
+    <td><img src="assets/sharanm.png" alt="Sharan Maiya" style="border-radius: 50%; width: 80px; height: 80px;"></td>
     <td><a href="mailto:sm2783@cam.ac.uk">Sharan Maiya</a></td>
-     <td><img src="assets/alinevd.png" alt="Aline Van Driessche" style="border-radius: 50%; width: 50px; height: 50px;"></td>
+     <td><img src="assets/alinevd.png" alt="Aline Van Driessche" style="border-radius: 50%; width: 80px; height: 80px;"></td>
     <td><a href="mailto:av656@cam.ac.uk">Aline Van Driessche</a></td>
   </tr>
 
