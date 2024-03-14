@@ -2,13 +2,6 @@
 
 [![DOI](https://zenodo.org/badge/735913470.svg)](https://zenodo.org/doi/10.5281/zenodo.10817670) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-<p align="middle">
-  <img src="assets/ai4er_logo.png" width="15%" />
-  <img src="assets/cambridge_logo.png" width="56%" /> 
-</p>
-
------
-
 ## Overview
 
 ## Repository Setup
@@ -51,3 +44,8 @@
 ## License and Citation
 
 If you use the code in this repository, please consider citing it--see the [`citation.cff`](citation.cff) file or use the "Cite this repository" function on the right sidebar. All code is under the MIT license--see the [`LICENSE`](LICENSE) file.
+
+<p align="middle">
+  <img src="assets/ai4er_logo.png" width="15%" />
+  <img src="assets/cambridge_logo.png" width="56%" /> 
+</p>
