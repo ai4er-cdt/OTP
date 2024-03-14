@@ -1,15 +1,22 @@
 # Repository Documentation
 
-This file contains a high-level overview of the repository structure and the role of each file within.
+This file contains a high-level overview of the repository structure and the role of each file within. For more details about any individual file or function, please consult the file directly--they are all relatively well commented. Notebooks include additional explanation as well.
+
+_If you find any bugs in the code or have trouble setting up your environment, please open an issue or contact us directly! Our emails are linked in the README and we'd be happy to help._
 
 ## Environment Setup
 
-**TODO: clean this section up and make sure instructions work from scratch!**
+To run the project locally, we recommend you set up your environment using [`conda`](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html).
 
 1. Clone this repository using `git clone --recursive <HTTPS or SSH>` to ensure the ECCO submodule is loaded as well.
-2. Edit the `environment.yml` file to include your own local filepath for your conda environments. See comment in file for further instructions.
-3. Create your conda python environment using `conda env create -f environment.yml` and activate the environment with `conda activate gtc`.
-4. Make sure you can run the first cell of `sandbox.ipynb`--this ensures that the ECCO package is loaded correctly and all dependencies have been installed to your python environment. If using VSCode, be sure to set your kernel to the `gtc` conda environment.
+2. Navigate to the newly created repository directory (i.e., use `cd OTP`).
+3. Edit the `environment.yml` file to include your own local filepath for your `conda` environments.
+   - If you're not sure what this filepath is, you can check using `conda info --envs`. The filepath should be `[FILEPATH FOR BASE ENVIRONMENT]/envs/gtc`. Notice that this ends in `gtc`--this will be the name of the created `conda` environment.
+4. Create your `conda` Python environment using `conda env create -f environment.yml`.
+5. Activate the environment with `conda activate gtc`.
+6. Make sure you can run the first cell of `setup_verification.ipynb`--this ensures that the ECCO package is loaded correctly and all dependencies have been installed to your python environment.
+   - `jupyter-lab` will be installed in the created `conda` environment, so you can run this notebook by spinning up Jupyter Lab (input the `jupyter-lab` command on the command line while in the project directory) and opening the notebook. Be sure you activate the `gtc` environment before opening Jupyter Lab.
+   - If using VSCode to run this notebook, be sure to set your kernel to the `gtc` conda environment.
 
 ## Repository Overview
 
