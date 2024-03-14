@@ -196,7 +196,7 @@ def align_inputs_outputs(inputs, outputs, date_range = ('1992-01-16', '2015-12-1
 
     return inputs, outputs
 
-def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = True, save_weights = True):
+def reg_results_txt(grid_search, fp, zonal_avgs, no_zonal_avgs, test_metrics, intercept_first = True, save_weights = True):
 
     """
     Helper function to write linear regression results to a text file.
@@ -207,8 +207,10 @@ def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = 
         sklearn grid search object
     fp : string
         the filepath to write to
-    data_vars : list
-        the list of data variables in the order
+    zonal_avgs : list
+        the list of variables for which zonal averages WERE taken
+    no_zonal_avgs : list
+        the list of variables for which zonal averages WERE NOT taken
     test_metrics : dictionary
         a dictionary of all test metrics to save
     intercept_first : boolean
@@ -232,7 +234,8 @@ def reg_results_txt(grid_search, fp, data_vars, test_metrics, intercept_first = 
             for k, v in named_weights.items():
                 f.write(f'{k} weight: {round(v, 3)}\n')
         else:
-            f.write(f'All longitudes used for: {" ".join(data_vars)}\n')
+            f.write(f'All longitudes used for: {" ".join(no_zonal_avgs)}\n' if len(no_zonal_avgs) > 0 else '')
+            f.write(f'Zonal averages used for: {" ".join(zonal_avgs)}\n' if len(zonal_avgs) > 0 else '')
 
         f.write('\n')
 
