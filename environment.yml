@@ -2,25 +2,27 @@ name: gtc
 channels:
   - defaults
 dependencies:
-  - pip
+  - python=3.12
+  - pip=23.3.1
   - ipykernel
-  - numpy
-  - xarray
-  - xgcm
-  - xmitgcm
-  - pyresample
-  - netcdf4
-  - matplotlib
-  - cartopy
-  - tqdm
-  - requests
-  - anaconda::scipy
-  - anaconda::dask
-  - statsmodels
-  - anaconda::scikit-learn
-  - anaconda::seaborn
-  - conda-forge::geopy
-  - gsw
-  - conda-forge::ffmpeg
-  - conda-forge::jupyterlab
+  - numpy=1.26.3
+  - xarray=2023.6.0
+  - xgcm=0.8.1
+  - xmitgcm=0.5.2
+  - pyresample=1.27.1
+  - netcdf4=1.6.2
+  - matplotlib=3.8.0
+  - cartopy=0.22.0
+  - tqdm=4.63.0
+  - requests=2.31.0
+  - anaconda::scipy=1.11.4
+  - anaconda::dask=2023.11.0
+  - conda-forge::statsmodels=0.14.1
+  - anaconda::scikit-learn=1.4.0
+  - anaconda::seaborn=0.12.2
+  - conda-forge::geopy=2.4.1
+  - gsw=3.6.17
+  - conda-forge::ffmpeg=6.1.1
+  - conda-forge::jupyterlab=4.1.2
+  - pytorch::pytorch=2.2.0
 prefix: /home/maish/miniconda3/envs/gtc # REMEMBER: replace this with the filepath to your conda environments!
