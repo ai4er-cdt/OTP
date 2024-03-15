@@ -33,7 +33,7 @@ This directory contains all Python scripts used for data download and preprocess
 
 ### `models/`
 
-This directory contains all machine learning model definitions (mostly different forms of neural networks), PyTorch dataset class definitions, model training loops, and utility functions for use during modelling.
+This directory contains all machine learning model definitions (mostly different forms of neural networks), `PyTorch` dataset class definitions, model training loops, and utility functions for use during modelling.
 
 **Model definitions:**
 - `MLP.py`: A basic multi-layer perceptron architecture, with options for multiple hidden layers with variable numbers of neurons and dropout.
@@ -45,16 +45,16 @@ This directory contains all machine learning model definitions (mostly different
 - `ESN.py`: An implementation of an Echo State Network, which is a fully-autoregressive deep learning model used in dynamical systems theory. We didn't use this model in our analysis, but its intended use was to help in predicting circulatory tipping points.
 
 **PyTorch dataset definitions:**
-- `RAPIDDataset.py`:
-- `SimDataset.py`:
+- `SimDataset.py`: A minimal dataset wrapper for use with a `PyTorch` dataloader.
+- `RAPIDDataset.py`: An extension of `SimDataset.py` that accounts for the auxiliary RAPID input.
 
 **Utility functions:**
-- `utils.py`:
-- `plotting_utils.py`:
+- `utils.py`: Many utility functions to facilitate modelling--data preprocessing, calculating metrics, and saving results.
+- `plotting_utils.py`: Two helpful plots for visually assessing model performance in reconstructing the MOC strength.
 
 **Model training loops:**
-- `train.py`:
-- `train_alt.py`:
+- `train.py`: A common training loop to be used for all neural network models. A mean squared error loss is used and AdamW is used for optimizing the model weights. Functionality is also provided for saving the model weights and training curve.
+- `train_alt.py`: A slight extension of `train.py` that includes early stopping and accomodates RAPID inputs by using `RAPIDDataset.py`.
 
 ### `notebooks/`
 
