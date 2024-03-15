@@ -1,7 +1,7 @@
 import warnings
 warnings.filterwarnings("ignore")
 import pickle
-import sys; sys.path.append("../models")
+import sys; sys.path.append("../../models")
 import utils
 import train
 from SOLODOCH import MLP
