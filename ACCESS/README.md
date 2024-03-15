@@ -12,7 +12,7 @@
 - `MLP.py` contains the constructor class for the Multilayer Perceptron architecture, as used to reproduce the results of Solodoch *et. al* (2023).
 - `plotting_utils.py` contains functions required to generate timeseries comparison plots as shown in the final report, as well as scatter plots to visualise the performance of regression techniques.
 - `utils.py` provides preprocessing functions that are customised to act on ACCESS data, including code to remove the trend and seasonality using an additive model.
-- `SimDataset.py` provides a custom Pytorch DataSet class for our project, which is compatible with our training procedure.
+- `SimDataset.py` provides a minimal dataset wrapper for use with a `PyTorch` dataloader.
 - `train.py` defines the training function used to fit MLP models to ACCESS data, incorporating early-stopping, weight decay and model validation.
 
 

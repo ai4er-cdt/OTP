@@ -77,19 +77,19 @@ This directory contains all of our major data processing and all modelling exper
 
 ### `ACCESS/`
 
-This directory contains all major data processing and all modelling experiments for ACCESS. Much of this code can be found elsewhere in the repository, but we choose to leave this in its own directory since it is a substantial extension.
+This directory contains all major data processing and all modelling experiments for ACCESS. Much of this code has been adpated from code found elsewhere in the repository, and so has been left in its own directory since it is a substantial extension.
 
 **Found elsewhere in repo:**
-- `MLP.py`:
-- `ESN.py`:
-- `SimDataset.py`:
-- `plotting_utils.py`:
-- `utils.py`:
-- `train.py`:
+- `MLP.py`: A basic multi-layer perceptron architecture, with options for multiple hidden layers with variable numbers of neurons and dropout.
+- `ESN.py`: An implementation of an Echo State Network, which is a fully-autoregressive deep learning model used in dynamical systems theory. We didn't use this model in our analysis, but its intended use was to help in predicting circulatory tipping points.
+- `SimDataset.py`: A minimal dataset wrapper for use with a `PyTorch` dataloader.
+- `plotting_utils.py`: Contains functions required to generate timeseries comparison plots as shown in the final report, as well as scatter plots to visualise the performance of regression techniques.
+- `utils.py`: Provides preprocessing functions that are customised to act on ACCESS data, including code to remove the trend and seasonality using an additive model.
+- `train.py`: A common training loop to be used for all neural network models. A mean squared error loss is used and AdamW is used for optimizing the model weights. Functionality is also provided for saving the model weights and training curve.
 
 **Unique to ACCESS:**
-- `data_retrieval.ipynb`:
-- `models.ipynb`:
+- `data_retrieval.ipynb`: Used to retrieve ACCESS data from the `data/` folder, preprocess input variables, and calculate the MOC. These Xarray dataarrays are then saved to the `processed_data/` folder.
+- `models.ipynb`: Used to construct and fit machine learning models in order to produce the results presented in Section **blah** of our final report. Models include (regularised) linear regression, multi-layer perceptrons, echo state networks, gaussaian process regression, and XGBoost. Data required to run this notebook is produced by the `data_retrieval.ipynb` notebook.
 
 # References
 [1] Solodoch, A., Stewart, A. L., McC. Hogg, A., & Manucharyan, G. E. (2023). Machine Learning‐Derived Inference of the Meridional Overturning Circulation From Satellite‐Observable Variables in an Ocean State Estimate. _Journal of Advances in Modeling Earth Systems_, 15(4), e2022MS003370.

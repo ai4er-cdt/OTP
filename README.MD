@@ -46,6 +46,10 @@ If you use the code in this repository, please consider citing it--see the [`cit
 
 **TODO: fill this section in!**
 
+- Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)). Entries used for our analysis are listed in the Appendix of our report.
+- ACCESS data was provided to us directly by colleagues at the National Oceanography Centre (NOC; Southampton, UK) and is not publically available but may be provided upon reasonable request.
+- RAPID data can be downloaded from the NOC British Oceanographic Data Centre: [https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c)
+
 -----
 
 <p align="middle">
