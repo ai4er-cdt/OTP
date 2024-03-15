@@ -32,5 +32,3 @@ class MLP(nn.Module):
             out = self.layers(out)
         out = self.ln_end(out)
         return out
-    
-print('hi from MLP.py!2')
