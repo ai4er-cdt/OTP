@@ -9,6 +9,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.metrics import r2_score, mean_squared_error, root_mean_squared_error, mean_absolute_error, mean_absolute_percentage_error
 import torch as t
+import sys
 
 def reshape_inputs(data: xr.core.dataset.Dataset,
                    keep_coords: List=["time", "latitude", "longitude"],
@@ -74,7 +75,86 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
         print(f"shape: {data.shape}")
     return t.Tensor(data) if return_pt else data
 
-def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True, standardize = True, lowpass = False):
+def custom_seasonal_decompose(mode, data, dims = ('time', 'latitude', 'longitude'), train_pct = 0.7):
+    # Extract important variables
+    vars = ['SSH', 'SST', 'SSS', 'OBP', 'ZWS']
+    times = data.time.values
+    latitudes = data.latitude.values
+    train_split = int(train_pct * data.sizes['time'])
+
+    if mode == 'inputs':
+        longitudes = data.longitude.values
+
+        train_data = data.isel(time = slice(0, train_split)).copy(deep = True)
+        test_data = data.isel(time = slice(train_split, data.sizes['time'])).copy(deep = True)
+
+        # Calculate linear trend
+        slopes = np.empty((len(vars), len(longitudes)))
+        intercepts = np.empty_like(slopes)
+        for j in range(len(vars)):
+            var = vars[j]
+            for i in range(len(longitudes)):
+                series = train_data[var].isel(latitude = 0, longitude = i)
+                y = series[series.notnull()]
+                x = np.arange(len(series))[series.notnull()]
+                if len(y) > 1:
+                    slope, intercept = np.polyfit(x, y, deg = 1)
+                    slopes[j, i] = slope
+                    intercepts[j, i] = intercept
+                else:
+                    slopes[j, i] = np.nan
+                    intercepts[j, i] = np.nan
+
+        # Subtract linear trend from train/test data
+        for j in range(len(vars)):
+            for i in range(len(longitudes)):
+                trend = (slopes[j, i] * np.arange(len(times))) + intercepts[j, i]
+
+                train_data[vars[j]].loc[ : , latitudes[0], longitudes[i]] -= trend[ : train_split]
+                test_data[vars[j]].loc[ : , latitudes[0], longitudes[i]] -= trend[train_split : ]
+
+        # Calculate monthly seasonal components from training data - remove from train/test seperately
+        monthly_means = train_data.groupby('time.month').mean()
+        train_data = train_data.groupby('time.month') - monthly_means
+        test_data = test_data.groupby('time.month') - monthly_means
+
+        inputs = xr.concat((train_data, test_data), dim = 'time')
+
+        return inputs
+    elif mode == 'outputs':
+        # Load output data
+        moc_train = data.moc.squeeze().values[ : train_split]
+        moc_test = data.moc.squeeze().values[train_split : ]
+
+        # Calculate and remove linear trend
+        y = moc_train
+        x = np.arange(train_split)
+
+        slope, intercept = np.polyfit(x, y, deg = 1)
+        trend = (slope * np.arange(len(data.moc))) + intercept
+
+        moc_train -= trend[ : train_split]
+        moc_test -= trend[train_split : ]
+
+        # Calculate and remove monthly seasonal component
+        moc_reshaped = moc_train[ : (moc_train.shape[0] // 12) * 12].reshape(-1, 12)
+        monthly_means = moc_reshaped.mean(axis = 0)
+
+        full_moc = np.concatenate([moc_train, moc_test])
+        monthly_means = monthly_means[np.newaxis, : ].repeat(full_moc.shape[0] // 12, axis = 0)
+        monthly_means = monthly_means.reshape(-1)
+        full_moc -= monthly_means
+
+        outputs = xr.full_like(data, 0)
+        outputs['moc'] = ((dims[0], dims[1]), full_moc.reshape(-1, 1))
+
+        return outputs
+    else:
+        raise ValueError('"mode" must be one of ["inputs", "outputs"]')
+
+
+def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_season = True,
+                        standardize = True, lowpass = False, train_pct = None):
 
     """
     Preprocessing function for covariates, including de-trending, de-seasonalizing, standardization,
@@ -96,6 +176,9 @@ def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_se
         deviation?
     lowpass : boolean
         should we apply a low-pass filter to the covariate timeseries?
+    train_pct : float or None
+        if not None, only the first "train_pct" percent of the timeseries is used
+        for fitting the preprocessing methods
 
     Returns
     -------
@@ -126,41 +209,67 @@ def apply_preprocessing(dataset, mode = 'inputs', remove_trend = True, remove_se
     # Instantiating a new array like the original to populate with preprocessed values
     preprocessed_array = xr.full_like(dataset, 0)
 
-    for k in dataset.keys():
-        var = dataset[k].values.squeeze()
-
-        var_deseason = seasonal_decompose(var, model = 'additive', period = 12, extrapolate_trend = 6)
-        new_var = var_deseason.resid # extract residual - the variation not captured by seasonality or long-term trend
-
-        if not remove_season:
-            new_var = new_var + var_deseason.seasonal # add back in seasonal component
-        if not remove_trend:
-            new_var = new_var + var_deseason.trend # add back in trend component
-
-        if lowpass:
-            cutoff = 2.0 # cutoff is 2.0 for 6-month LPF
-            fs = 12.0 # freq of sampling is 12.0 times in a year
-            order = 6 # order of polynomial component of filter
-
-            b, a = butter(order, cutoff, fs = fs, btype = 'low', analog = False)
-            new_var = filtfilt(b, a, new_var, axis = 0) # apply on each lon timeseries separately
-
-        # Making sure to apply standardization last to ensure covariates have the right time-wise stats
+    # New behavior: fit standardization/trend + seasonality ONLY on train set to
+    #  ensure no data leakage
+    if train_pct is not None:
+        if remove_trend and remove_season:
+            new_dataset = custom_seasonal_decompose(mode, dataset, dims = dims, train_pct = train_pct)
         if standardize and mode == 'inputs':
-            scaler = StandardScaler()
-            if new_var.ndim == 1:
-                new_var = new_var.reshape(-1, 1)
-            new_var = scaler.fit_transform(new_var)
+            if (not remove_trend) or (not remove_season):
+                new_dataset = dataset.copy(deep = True)
 
-        # Adding back in latitude dimension that got squeezed out
-        if mode == 'inputs' and 'latitude' in dataset.dims:
-            if new_var.ndim == 1:
-                new_var = new_var.reshape(-1, 1)
-            new_var = new_var.reshape(new_var.shape[0], 1, new_var.shape[1])
-        elif mode == 'outputs' and 'latitude' in dataset.dims:
-            new_var = new_var.reshape(new_var.shape[0], 1)
+            #  loop through variables and standardize them independently for each longitude
+            for var in new_dataset:
+                dataset_np = new_dataset[var].squeeze().to_numpy()
+                train_split = int(train_pct * dataset.sizes['time'])
 
-        preprocessed_array[k] = (dims, new_var)
+                scaler = StandardScaler()
+                train_vals = scaler.fit_transform(dataset_np[ : train_split])
+                test_vals = scaler.transform(dataset_np[train_split : ])
+
+                all_vals = np.concatenate((train_vals, test_vals), axis = 0)[ : , np.newaxis, : ]
+
+                new_dataset[var] = (dims, all_vals)
+
+        preprocessed_array = new_dataset.copy(deep = True) if (remove_trend or remove_season or standardize) else dataset.copy()
+
+    # Old behavior: fit standardization/trend + seasonality on ALL data indiscriminately
+    else:
+        for k in dataset.keys():
+            var = dataset[k].values.squeeze()
+
+            var_deseason = seasonal_decompose(var, model = 'additive', period = 12, extrapolate_trend = 6)
+            new_var = var_deseason.resid # extract residual - the variation not captured by seasonality or long-term trend
+
+            if not remove_season:
+                new_var = new_var + var_deseason.seasonal # add back in seasonal component
+            if not remove_trend:
+                new_var = new_var + var_deseason.trend # add back in trend component
+
+            if lowpass:
+                cutoff = 2.0 # cutoff is 2.0 for 6-month LPF
+                fs = 12.0 # freq of sampling is 12.0 times in a year
+                order = 6 # order of polynomial component of filter
+
+                b, a = butter(order, cutoff, fs = fs, btype = 'low', analog = False)
+                new_var = filtfilt(b, a, new_var, axis = 0) # apply on each lon timeseries separately
+
+            # Making sure to apply standardization last to ensure covariates have the right time-wise stats
+            if standardize and mode == 'inputs':
+                scaler = StandardScaler()
+                if new_var.ndim == 1:
+                    new_var = new_var.reshape(-1, 1)
+                new_var = scaler.fit_transform(new_var)
+
+            # Adding back in latitude dimension that got squeezed out
+            if mode == 'inputs' and 'latitude' in dataset.dims:
+                if new_var.ndim == 1:
+                    new_var = new_var.reshape(-1, 1)
+                new_var = new_var.reshape(new_var.shape[0], 1, new_var.shape[1])
+            elif mode == 'outputs' and 'latitude' in dataset.dims:
+                new_var = new_var.reshape(new_var.shape[0], 1)
+
+            preprocessed_array[k] = (dims, new_var)
 
     return preprocessed_array
 
@@ -283,3 +392,25 @@ def custom_MAPE(y_test, y_pred, threshold = 0, return_num_discarded = False):
         return mape, initial_len - new_len
 
     return mape
+
+if __name__ == '__main__':
+    import pickle
+    import matplotlib.pyplot as plt
+
+    data_home = '/Users/emiliolr/Google Drive/My Drive/GTC'
+
+    inputs = xr.open_dataset(f'{data_home}/ecco_data_minimal/60S.nc')
+    inputs = inputs.isel(latitude = 1) # pull out just the lat of interest
+    inputs = inputs.expand_dims({'latitude' : 1}) # add back in latitude dim to make things work better
+
+    outputs_fp = f'{data_home}/ecco_data_minimal/60S_moc_density.pickle'
+    with open(outputs_fp, 'rb') as f:
+        outputs = pickle.load(f)
+    outputs = np.expand_dims(outputs, 1)
+    outputs = xr.Dataset(data_vars = {'moc' : (['time', 'latitude'], outputs)},
+                         coords = {'time' : inputs.time, 'latitude' : np.atleast_1d(-60)})
+
+    new_outputs = apply_preprocessing(outputs, mode = 'outputs', remove_trend = True, remove_season = True,
+                                      standardize = False, lowpass = False)
+    to_check = new_outputs.moc.isel(time = slice(0, int(0.7 * len(outputs.time))))
+    print(to_check.mean('time'), to_check.std('time'))
