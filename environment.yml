@@ -15,10 +15,10 @@ dependencies:
   - cartopy=0.22.0
   - tqdm=4.63.0
   - requests=2.31.0
-  - anaconda::scipy=1.11.4
-  - anaconda::dask=2023.11.0
+  - scipy=1.11.4
+  - dask=2023.11.0
   - conda-forge::statsmodels=0.14.1
-  - anaconda::scikit-learn=1.4.0
+  - conda-forge::scikit-learn=1.4.0
   - anaconda::seaborn=0.12.2
   - conda-forge::geopy=2.4.1
   - gsw=3.6.17
