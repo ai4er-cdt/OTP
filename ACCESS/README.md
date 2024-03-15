@@ -2,7 +2,7 @@
 
 ### Notebooks
 
--`data_retrieval.ipynb` is used to retrieve ACCESS data from the `data/` folder, preprocess input variables, and calculate the MOC. These Xarray dataarrays are then saved to the `processed_data/` folder.
+- `data_retrieval.ipynb` is used to retrieve ACCESS data from the `data/` folder, preprocess input variables, and calculate the MOC. These Xarray dataarrays are then saved to the `processed_data/` folder.
 - `models.ipynb` is used to construct and fit machine learning models in order to produce the results presented in Section **blah** of our final report. Models include (regularised) linear regression, multi-layer perceptrons, echo state networks, gaussaian process regression, and XGBoost. Data required to run this notebook is produced by the `data_retrieval.ipynb` notebook.
 
 
