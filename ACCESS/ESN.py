@@ -106,7 +106,7 @@ class ESN:
         spectral_radius: desired spectral radius of the reservoir weights - see spectral_normalising
         warmup: reservoir is initialised at zero. to combat this, a number of sampled can be used as a warmup before fitting
         """
-        warn("Data must be sorted by time for ESN.")
+        # warn("Data must be sorted by time for ESN.")
         self.n_input = n_input
         self.n_reservoir = n_reservoir
         self.alpha = alpha

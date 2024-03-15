@@ -1,26 +1,18 @@
 # AI4ER Guided Team Challenge 2024
 
-<p align="middle">
-  <img src="assets/ai4er_logo.png" width="15%" />
-  <img src="assets/cambridge_logo.png" width="56%" /> 
-</p>
+[![DOI](https://zenodo.org/badge/735913470.svg)](https://zenodo.org/doi/10.5281/zenodo.10817670) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
------
+## Project Description
 
-## Overview
+**TODO: fill this section in!**
 
-## Repository Setup
+## Documentation
 
-1. Clone this repository using `git clone --recursive <HTTPS or SSH>` to ensure the ECCO submodule is loaded as well.
-2. Edit the `environment.yml` file to include your own local filepath for your conda environments. See comment in file for further instructions.
-3. Create your conda python environment using `conda env create -f environment.yml` and activate the environment with `conda activate gtc`.
-4. Make sure you can run the first cell of `sandbox.ipynb`--this ensures that the ECCO package is loaded correctly and all dependencies have been installed to your python environment. If using VSCode, be sure to set your kernel to the `gtc` conda environment.
-
-## Data Availability
-
-## License
+Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository.
 
 ## Acknowledgements
+
+We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and Alberto Naveira Garabato--as well as our project mentors--Josh Lanham and Kate Oglethorpe. Their guidance throughout was instrumental in our success as a team. We would also like to thank the AI4ER support staff--Annabelle Scott and Adriana Dote--for their help navigating the complex logistics of the Guided Team Challenge.
 
 -----
 
@@ -48,6 +40,19 @@
 
 ## License and Citation
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-
 If you use the code in this repository, please consider citing it--see the [`citation.cff`](citation.cff) file or use the "Cite this repository" function on the right sidebar. All code is under the MIT license--see the [`LICENSE`](LICENSE) file.
+
+## Data Availability
+
+**TODO: fill this section in!**
+
+- Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)). Entries used for our analysis are listed in the Appendix of our report.
+- ACCESS data was provided to us directly by colleagues at the National Oceanography Centre (NOC; Southampton, UK) and is not publically available but may be provided upon reasonable request.
+- RAPID data can be downloaded from the NOC British Oceanographic Data Centre: [https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c)
+
+-----
+
+<p align="middle">
+  <a href="https://ai4er-cdt.esc.cam.ac.uk/"><img src="assets/ai4er_logo.png" width="15%"/></a>
+  <a href="https://www.cam.ac.uk/"><img src="assets/cambridge_logo.png" width="56%"/></a>
+</p>
