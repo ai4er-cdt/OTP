@@ -1,6 +1,6 @@
 import os
 from typing import Optional
-from models import SimDataset
+from models import SimDataset, RAPIDDataset
 import torch as t
 import torch.nn as nn
 from torch.utils.data import DataLoader
@@ -42,11 +42,16 @@ def train_model(model: nn.Module,
                 y_train: t.Tensor, 
                 name: str="model",
                 loss_function: str="mse",
+                dtype: str='float',
                 X_val: Optional[t.Tensor]=None,
                 y_val: Optional[t.Tensor]=None,
                 early_stopping: Optional[bool]=False,
                 eval_iter: Optional[int]=None,
+                min_delta: Optional[float] = 0.1,
+                threshold: Optional[int]=50,
+                RAPID_dataset: Optional[bool] = False,
                 device: Optional[str]=None):
+
     
     loss_L1 = nn.L1Loss()
     loss_MSE = nn.MSELoss()
@@ -70,7 +75,10 @@ def train_model(model: nn.Module,
     print(f"{sum([p.numel() for p in model.parameters()])} parameters.")
         
     # get training data
-    train_dataset = SimDataset.SimDataset(X_train, y_train, device)
+    if RAPID_dataset is True:
+        train_dataset = RAPIDDataset.RAPIDDataset(X_train, y_train, device)
+    else:
+        train_dataset = SimDataset.SimDataset(X_train, y_train, device)
     train_DL = DataLoader(train_dataset, batch_size, shuffle=True)
     data_iterator = cycle(train_DL)
 
@@ -86,12 +94,13 @@ def train_model(model: nn.Module,
         criterion = composite_loss
     opt = t.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
     train_loss = []; val_loss = []
-    if early_stopping: es = EarlyStopping(patience=100, min_delta = 0.1, threshold=50)
+    if early_stopping: es = EarlyStopping(patience=100, min_delta = min_delta, threshold=threshold)
     if eval_iter is None:
         for iter in trange(max_iters):
             # use dataloader to sample a batch
             x, y = next(data_iterator)
-            #x = x.float(); y = y.float()
+            if dtype == 'float':
+                x = x.float(); y = y.float()
             # update model
             out = model(x)
             loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
@@ -112,7 +121,8 @@ def train_model(model: nn.Module,
         for iter in range(max_iters):
             # use dataloader to sample a batch
             x, y = next(data_iterator)
-            #x = x.float(); y = y.float()
+            if dtype == 'float':
+                x = x.float();y = y.float()
             # update model
             out = model(x)
             loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
@@ -138,3 +148,33 @@ def train_model(model: nn.Module,
         return model, train_loss, val_loss
     else:
         return model, train_loss
+
+def predict(
+    model: nn.Module,
+    X: t.Tensor,
+    y: t.Tensor,
+    device: str | None = None,
+    RAPID_dataset: Optional[bool]=False,
+):
+
+    if device == None:
+        device = "cuda" if t.cuda.is_available() else "cpu"
+
+    # get training data
+    if RAPID_dataset is True:
+        test_dataset = RAPIDDataset.RAPIDDataset(X, y, device)
+    else:
+        test_dataset = SimDataset.SimDataset(X, y, device)
+    test_DL = DataLoader(test_dataset, 1, shuffle=False)
+    data_iterator = cycle(test_DL)
+
+    y_pred = []
+
+    # training
+    model.eval()
+    with t.no_grad():
+        for x, y in test_DL:
+            outputs = model(x)
+            y_pred.extend(outputs.cpu().numpy())
+
+    return y_pred
