@@ -93,7 +93,7 @@ This directory contains all major data processing and all modelling experiments 
 
 ## Reproducing Report Figures and Tables
 
-See the tables below for the notebooks to run to reproduce each figure and table in the final report.
+See the tables below for the notebooks to run to reproduce each figure and table in the final report. As a general case, these notebooks are contained within the `notebooks/` directory; however, all ACCESS-related results are in the `ACCESS/` directory (Tables 12-14).
 
 ### Figures
 
@@ -119,6 +119,31 @@ See the tables below for the notebooks to run to reproduce each figure and table
 |    18    |             `neural_networks.ipynb`             |
 
 ### Tables
+
+**Note:** as a general case, one cannot obtain the full results needed to reproduce each table with one run of the notebook. Instead, the user must change clearly marked hyperparameters, input variables, and preprocessing steps to sequentially obtain all results.
+
+| Table # |                  Notebook                 |
+|:-------:|:-----------------------------------------:|
+|    1    |         `linear_regression.ipynb`         |
+|    2    |         `linear_regression.ipynb`         |
+|    3    | `solodoch_replication/train_models.ipynb` |
+|    4    |  `Trend_and_season_neural_networks.ipynb` |
+|    5    |          `neural_networks.ipynb`          |
+|    6    |          `neural_networks.ipynb`          |
+|    7    |          `neural_networks.ipynb`          |
+|    8    |                     -                     |
+|    9    |  `RAPID_transfer_linear_regression.ipynb` |
+|    10   |   `RAPID_transfer_neural_network.ipynb`   |
+|    11   |        `southern_ocean_modelling/*`       |
+|    12   |           `ACCESS/models.ipynb`           |
+|    13   |           `ACCESS/models.ipynb`           |
+|    14   |           `ACCESS/models.ipynb`           |
+|    15   |         `linear_regression.ipynb`         |
+|    16   |         `linear_regression.ipynb`         |
+|    17   |                     -                     |
+|    18   |  `RAPID_transfer_linear_regression.ipynb` |
+|    19   |   `RAPID_transfer_neural_network.ipynb`   |
+|    20   |                     -                     |
 
 # References
 [1] Solodoch, A., Stewart, A. L., McC. Hogg, A., & Manucharyan, G. E. (2023). Machine Learning‐Derived Inference of the Meridional Overturning Circulation From Satellite‐Observable Variables in an Ocean State Estimate. _Journal of Advances in Modeling Earth Systems_, 15(4), e2022MS003370.
