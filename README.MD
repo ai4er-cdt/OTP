@@ -6,15 +6,11 @@
 
 In this study, we assess how satellite-observable variables can be used to infer abyssal Meridional Overturning Circulation (MOC) strength using machine learning. We replicate and improve upon previous methods, and provide a thorough baseline for predicting the abyssal MOC strength using regularised linear regression. We incorporate ACCESS, a high-resolution ocean circulation model, and observational RAPID data, an array of sensors that directly measures the Atlantic MOC strength; we are the first to use these to both evaluate and improve predictive models performance in the Southern Ocean. Finally, we provide initial evidence of an approximately linear relationship between satellite-observable variables and abyssal MOC strength, demonstrate the utility of observational data to predict long-range oceanic dependencies, and show that a deep learning model is able to capture latitude-invariant circulation dynamics.
 
-This work was carried out as part of the [Artificial Intelligence for Environmental Risks](https://ai4er-cdt.esc.cam.ac.uk/) (AI4ER) Centre for Doctoral Training Guided Team Challenge (GTC).
+This work was carried out as part of the [Artificial Intelligence for Environmental Risks](https://ai4er-cdt.esc.cam.ac.uk/) (AI4ER) Centre for Doctoral Training Guided Team Challenge (GTC), which ran from November, 2023 to March, 2024.
 
 ## Documentation
 
 Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository structure.
-
-## Acknowledgements
-
-We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and Alberto Naveira Garabato--as well as our project mentors--Josh Lanham and Kate Oglethorpe. Their guidance throughout was instrumental in our success as a team. We would also like to thank the AI4ER support staff--Annabelle Scott and Adriana Dote--for their help navigating the complex logistics of the Guided Team Challenge.
 
 -----
 
@@ -37,6 +33,10 @@ We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and 
   </tr>
 
 </table>
+
+## Acknowledgements
+
+We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and Alberto Naveira Garabato--as well as our project mentors--Josh Lanham and Kate Oglethorpe. Their guidance throughout was instrumental in our success as a team. We would also like to thank the AI4ER support staff--Annabelle Scott and Adriana Dote--for their help navigating the complex logistics of the GTC.
 
 -----
 
