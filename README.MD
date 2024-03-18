@@ -44,22 +44,19 @@ If you use the code in this repository, please consider citing it--see the [`cit
 
 ## Data Availability
 
-**TODO: fill this section in!**
+### ECCO 
 
-|       Data Type       |               PO.DAAC Entry              |                 DOI                 |
-|:---------------------:|:----------------------------------------:|:-----------------------------------:|
-|          SSH          |      ECCO_L4_SSH_05DEG_MONTHLY_V4R4      | https://doi.org/10.5067/ECG5M-SSH44 |
-|          SSS          | ECCO_L4_TEMP_SALINITY_05DEG_MONTHLY_V4R4 | https://doi.org/10.5067/ECG5M-OTS44 |
-|          SST          | ECCO_L4_TEMP_SALINITY_05DEG_MONTHLY_V4R4 | https://doi.org/10.5067/ECG5M-OTS44 |
-|          ZWS          |     ECCO_L4_STRESS_05DEG_MONTHLY_V4R4    | https://doi.org/10.5067/ECG5M-STR44 |
-|          OBP          |      ECCO_L4_OBP_05DEG_MONTHLY_V4R4      | https://doi.org/10.5067/ECG5M-OBP44 |
-| Monthly-Mean Velocity |   ECCO_L4_OCEAN_VEL_05DEG_MONTHLY_V4R4   | https://doi.org/10.5067/ECG5M-OVE44 |
-|     Bolus Velocity    |     ECCO_L4_BOLUS_05DEG_MONTHLY_V4R4     | https://doi.org/10.5067/ECG5M-BOL44 |
-|  Model Grid Geometry  |     ECCO_L4_GEOMETRY_LLC0090GRID_V4R4    | https://doi.org/10.5067/ECL5A-GRD44 |
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10832706.svg)](https://doi.org/10.5281/zenodo.10832706)
 
-- Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)). See the table above for PO.DAAC entries.
-- ACCESS data was provided to us directly by colleagues at the National Oceanography Centre (NOC; Southampton, UK) and is not publicly available but may be provided upon reasonable request.
-- RAPID data can be downloaded from the NOC British Oceanographic Data Centre: [https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c)
+All ECCO data that we extracted is included in the Zenodo repository linked in the badge directly above. To facilitate interpretation of the code in this repository, we have copied over the data [`README`](DATA_README.md). Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)). See the table below for the PO.DAAC entries for each variable.
+
+### ACCESS
+
+ACCESS data was provided to us directly by colleagues at the National Oceanography Centre (NOC; Southampton, UK) and is not publicly available but may be provided upon reasonable request. Team member emails are linked above.
+
+### RAPID
+
+RAPID data can be downloaded from the NOC British Oceanographic Data Centre: [https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c). This data was used in the provided format. We primarily make use of `moc_transports_200404_2022215.nc` and `moc_vertical_200404_2022215.nc`. 
 
 -----
 
