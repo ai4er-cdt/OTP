@@ -91,5 +91,9 @@ This directory contains all major data processing and all modelling experiments 
 - `data_retrieval.ipynb`: Used to retrieve ACCESS data from the `data/` folder, preprocess input variables, and calculate the MOC. These Xarray dataarrays are then saved to the `processed_data/` folder.
 - `models.ipynb`: Used to construct and fit machine learning models in order to produce the results presented in Section **blah** of our final report. Models include (regularised) linear regression, multi-layer perceptrons, echo state networks, gaussaian process regression, and XGBoost. Data required to run this notebook is produced by the `data_retrieval.ipynb` notebook.
 
+## Reproducing Report Figures and Tables
+
+See the tables below for the notebooks to run to reproduce each figure and table in the final report.
+
 # References
 [1] Solodoch, A., Stewart, A. L., McC. Hogg, A., & Manucharyan, G. E. (2023). Machine Learning‐Derived Inference of the Meridional Overturning Circulation From Satellite‐Observable Variables in an Ocean State Estimate. _Journal of Advances in Modeling Earth Systems_, 15(4), e2022MS003370.
