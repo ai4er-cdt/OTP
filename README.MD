@@ -10,7 +10,7 @@ This work was carried out as part of the [Artificial Intelligence for Environmen
 
 ## Documentation
 
-Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository structure. We include a table that directs the user towards the appropriate notebook for reproducing each table and figure in the final report.
+Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository structure. We include [tables](DOCUMENTATION.md#reproducing-report-figures-and-tables) that direct the user towards the appropriate notebook for reproducing each table and figure in the final report.
 
 -----
 
