@@ -56,7 +56,9 @@ ACCESS data was provided to us directly by colleagues at the National Oceanograp
 
 ### RAPID
 
-RAPID data can be downloaded from the NOC British Oceanographic Data Centre: [https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c). This data was used in the provided format. We primarily make use of `moc_transports_200404_2022215.nc` and `moc_vertical_200404_2022215.nc`. 
+[![DOI](https://img.shields.io/badge/DOI-10.5285%2F04c79ece--3186--349a--e063--6c86abc0158c-blue)](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c)
+
+RAPID data can be downloaded from the NOC British Oceanographic Data Centre (linked in the badge above). This data was used in the provided format. We primarily make use of `moc_transports_200404_2022215.nc` and `moc_vertical_200404_2022215.nc`. 
 
 -----
 
