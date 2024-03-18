@@ -20,7 +20,7 @@ To run the project locally, we recommend you set up your environment using [`con
 
 ## Repository Overview
 
-Many directories containn an `archive/` sub-directory, which contains code that was produced during the project, but is not needed to reproduce our final analysis. Many of these archived files are well-commented or self-explanatory, but given their secondary nature we do not describe them in the same level of detail in this overview.
+Many directories containn an `archive/` sub-directory, which contains code that was produced during the project, but is not needed to reproduce our final analysis. Many of these archived files are well-commented or self-explanatory, but given their secondary nature we do not describe them with the same level of detail in this overview.
 
 ### `scripts/`
 
@@ -41,7 +41,7 @@ This directory contains all machine learning model definitions (mostly different
 - `CNN1D.py`: A 1-dimensional convolutional neural network, with both "pure" layers (i.e., independent filters for each feature) and "mix" layers (i.e., filters that act on multiple features at once). Options are also included for dropout, number of layers, and number of filters. This model is usually used to convolve over longitudes when input variables contain full zonal information.
 - `CNN2D.py`: A 2-dimensional convolutional neural network, with both "pure" layers and "mix" layers. Options are also included for dropout, number of layers, and number of filters. This model is usually used to convolve over a latitudinal strip and over longitudes.
 - `CNN3D.py`: A 3-dimensional convolutional neural network, with both "pure" layers and "mix" layers. Options are also included for dropout, number of layers, and number of filters. We didn't use this model in our analysis, but its intended use it for convolving over latitudes, longitudes, and through time.
-- `CNN_RAPID.py`: A custom 3-dimensional convolutional neural network that adds an encoding for RAPID data which is concatenated after the convolutions are applied to surface variables. Otherwise the same as `CNN2D.py`
+- `CNN_RAPID.py`: A custom 2-dimensional convolutional neural network that adds an encoding for RAPID data which is concatenated after the convolutions are applied to surface variables. Otherwise the same as `CNN2D.py`
 - `ESN.py`: An implementation of an Echo State Network, which is a fully-autoregressive deep learning model used in dynamical systems theory. We didn't use this model in our analysis, but its intended use was to help in predicting circulatory tipping points.
 
 **PyTorch dataset definitions:**
@@ -61,19 +61,23 @@ This directory contains all machine learning model definitions (mostly different
 This directory contains all of our major data processing and all modelling experiments for ECCO.
 
 **Data processing & exploration:**
-- `streamfunction/`:
-- `moc/`:
+- `streamfunction/`: A number of notebooks used to calculate depth- and density-space overturning streamfunctions (`psi_*.ipynb` and `sf_*.ipynb`), as well as explore the vertical profiles of the resulting streamfunctions (`plotting_streamfunctions.ipynb`)
+- `moc/`: The notebooks used to calculate final MOC strength time series (`sl_moc.ipynb` and `so_moc.ipynb`) and plot them (`so_moc.ipynb` and `so_visualization.ipynb`).
 
 **Linear regression experiments:**
-- `linear_regression.ipynb`:
-- `latitude_transfer_linear_regression`:
+- `linear_regression.ipynb`: All (regularised) linear regression experiments for the four latitudes of interest. Models can be fit as static in time vs. history of input variables, zonal averages vs. full zonal information, and with vs. without trend and seasonality.
+- `latitude_transfer_linear_regression`: Experiments for (regularised) linear regression across the Southern Ocean. This includes both model transfer from 60S to all Southern Ocean latitudes as well as training an independent model on each Southern Ocean latitude. Much of this code is copied over from `linear_regression.ipynb`, but with minimal changes.
 
 **CNN experiments:**
-- `neural_networks.ipynb`:
+- `neural_networks.ipynb`: All experiments for 1-dimensional and 2-dimensional convolutional neural networks, with a focus on 60S. This notebook includes experiments with differing lengths of input history and model performance on each of the four latidues of interest.
+- `Trend_and_season_neural_networks.ipynb`: 1-dimensional and 2-dimensional convolutional neural network experiments on the four latitudes of interest with different combinations of time series preprocessing (with/without trend and seasonality).
 
 **RAPID experiments:**
-- `RAPID_transfer_linear_regression.ipynb`:
+- `RAPID_transfer_linear_regression.ipynb`: 
 - `RAPID_transfer_neural_network.ipynb`:
+
+**Full Southern Ocean experiments:**
+- `southern_ocean_modelling/[MODEL].ipynb`: Model training on the _full_ Southern Ocean and evaluation across all Southern Ocean latitudes. The implements methods are: linear maps, multi-layer perceptrons, recurrent neural networks, long-short term memory networks, and gated recurrent units. All notebooks have the same overall structure.
 
 ### `ACCESS/`
 
