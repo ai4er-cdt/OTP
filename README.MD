@@ -4,11 +4,13 @@
 
 ## Project Description
 
-**TODO: fill this section in!**
+In this study, we assess how satellite-observable variables can be used to infer abyssal Meridional Overturning Circulation (MOC) strength using machine learning. We replicate and improve upon previous methods, and provide a thorough baseline for predicting the abyssal MOC strength using regularised linear regression. We incorporate ACCESS, a high-resolution ocean circulation model, and observational RAPID data, an array of sensors that directly measures the Atlantic MOC strength; we are the first to use these to both evaluate and improve predictive models performance in the Southern Ocean. Finally, we provide initial evidence of an approximately linear relationship between satellite-observable variables and abyssal MOC strength, demonstrate the utility of observational data to predict long-range oceanic dependencies, and show that a deep learning model is able to capture latitude-invariant circulation dynamics.
+
+This work was carried out as part of the [Artificial Intelligence for Environmental Risks](https://ai4er-cdt.esc.cam.ac.uk/) (AI4ER) Centre for Doctoral Training Guided Team Challenge (GTC).
 
 ## Documentation
 
-Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository.
+Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository structure.
 
 ## Acknowledgements
 
@@ -41,6 +43,8 @@ We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and 
 ## License and Citation
 
 If you use the code in this repository, please consider citing it--see the [`citation.cff`](citation.cff) file or use the "Cite this repository" function on the right sidebar. All code is under the MIT license--see the [`LICENSE`](LICENSE) file.
+
+-----
 
 ## Data Availability
 
