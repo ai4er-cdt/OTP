@@ -52,7 +52,7 @@ If you use the code in this repository, please consider citing it--see the [`cit
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10832706.svg)](https://doi.org/10.5281/zenodo.10832706)
 
-All ECCO data that we extracted is included in the Zenodo repository linked in the badge directly above. To facilitate interpretation of the code in this repository, we have copied over dataset metadata--see [`DATA_README.md`](DATA_README.md). Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)). See the table below for the PO.DAAC entries for each variable.
+All ECCO data that we extracted is included in the Zenodo repository linked in the badge directly above. To facilitate interpretation of the code in this repository, we have copied over dataset metadata--see [`DATA_README.md`](DATA_README.md). Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)); see the table in the data README for the PO.DAAC entries that we accessed.
 
 ### ACCESS
 
@@ -62,7 +62,7 @@ ACCESS data was provided to us directly by colleagues at the National Oceanograp
 
 [![DOI](https://img.shields.io/badge/DOI-10.5285%2F04c79ece--3186--349a--e063--6c86abc0158c-blue)](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c)
 
-RAPID data can be downloaded from the NOC British Oceanographic Data Centre (linked in the badge above). This data was used in the provided format. We primarily make use of `moc_transports_200404_2022215.nc` and `moc_vertical_200404_2022215.nc`. 
+RAPID data can be downloaded from the NOC British Oceanographic Data Centre (linked in the badge directly above). This data was used in the provided format. We primarily make use of `moc_transports_200404_2022215.nc` and `moc_vertical_200404_2022215.nc`. 
 
 -----
 
