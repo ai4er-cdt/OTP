@@ -73,8 +73,7 @@ This directory contains all of our major data processing and all modelling exper
 - `Trend_and_season_neural_networks.ipynb`: 1-dimensional and 2-dimensional convolutional neural network experiments on the four latitudes of interest with different combinations of time series preprocessing (with/without trend and seasonality).
 
 **RAPID experiments:**
-- `RAPID_transfer_linear_regression.ipynb`: 
-- `RAPID_transfer_neural_network.ipynb`:
+- `RAPID_transfer_linear_regression.ipynb` and `RAPID_transfer_neural_network.ipynb`: Experiments to test the utility of integrating RAPID observational MOC strength data when predicting at southern latitudes (i.e., 30S) using (regularised) linear regression and convolutional neural networks, respectively.
 
 **Full Southern Ocean experiments:**
 - `southern_ocean_modelling/[MODEL].ipynb`: Model training on the _full_ Southern Ocean and evaluation across all Southern Ocean latitudes. The implements methods are: linear maps, multi-layer perceptrons, recurrent neural networks, long-short term memory networks, and gated recurrent units. All notebooks have the same overall structure.
@@ -92,8 +91,8 @@ This directory contains all major data processing and all modelling experiments 
 - `train.py`: A common training loop to be used for all neural network models. A mean squared error loss is used and AdamW is used for optimizing the model weights. Functionality is also provided for saving the model weights and training curve.
 
 **Unique to ACCESS:**
-- `data_retrieval.ipynb`: Used to retrieve ACCESS data from the `data/` folder, preprocess input variables, and calculate the MOC. These Xarray dataarrays are then saved to the `processed_data/` folder.
-- `models.ipynb`: Used to construct and fit machine learning models in order to produce the results presented in Section **blah** of our final report. Models include (regularised) linear regression, multi-layer perceptrons, echo state networks, gaussaian process regression, and XGBoost. Data required to run this notebook is produced by the `data_retrieval.ipynb` notebook.
+- `data_retrieval.ipynb`: Used to retrieve ACCESS data from the `data/` folder, preprocess input variables, and calculate the MOC strength time series. These `xarray` dataarrays are then saved to the `processed_data/` folder.
+- `models.ipynb`: Used to construct and fit machine learning models for our final report. Models include (regularised) linear regression, multi-layer perceptrons, echo state networks, gaussian process regression, and XGBoost. Data required to run this notebook is produced by the `data_retrieval.ipynb` notebook.
 
 ## Reproducing Report Figures and Tables
 
