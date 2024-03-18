@@ -95,5 +95,30 @@ This directory contains all major data processing and all modelling experiments 
 
 See the tables below for the notebooks to run to reproduce each figure and table in the final report.
 
+### Figures
+
+| Figure # |                     Notebook                    |
+|:--------:|:-----------------------------------------------:|
+|     1    |           `archive/basin_masks.ipynb`           |
+|     2    |                        -                        |
+|     3    | `streamfunction/plotting_streamfunctions.ipynb` |
+|     4    | `streamfunction/plotting_streamfunctions.ipynb` |
+|     5    |                        -                        |
+|     6    | `streamfunction/plotting_streamfunctions.ipynb` |
+|     7    | `streamfunction/plotting_streamfunctions.ipynb` |
+|     8    |                        ?                        |
+|     9    |            `linear_regression.ipynb`            |
+|    10    |    `solodoch_replication/train_models.ipynb`    |
+|    11    |    `solodoch_replication/train_models.ipynb`    |
+|    12    |             `neural_networks.ipynb`             |
+|    13    |                        ?                        |
+|    14    |     `RAPID_transfer_linear_regression.ipynb`    |
+|    15    |   `latitude_transfer_linear_regression.ipynb`   |
+|    16    |   `latitude_transfer_linear_regression.ipynb`   |
+|    17    |       `southern_ocean_modelling/MLP.ipynb`      |
+|    18    |             `neural_networks.ipynb`             |
+
+### Tables
+
 # References
 [1] Solodoch, A., Stewart, A. L., McC. Hogg, A., & Manucharyan, G. E. (2023). Machine Learning‐Derived Inference of the Meridional Overturning Circulation From Satellite‐Observable Variables in an Ocean State Estimate. _Journal of Advances in Modeling Earth Systems_, 15(4), e2022MS003370.
