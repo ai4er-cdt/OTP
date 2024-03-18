@@ -52,7 +52,7 @@ If you use the code in this repository, please consider citing it--see the [`cit
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10832706.svg)](https://doi.org/10.5281/zenodo.10832706)
 
-All ECCO data that we extracted is included in the Zenodo repository linked in the badge directly above. To facilitate interpretation of the code in this repository, we have copied over dataset metadata--see [`DATA_README.md`](DATA_README.md). Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)); see the table in the data README for the PO.DAAC entries that we accessed.
+All ECCO data that we extracted is included in the Zenodo repository linked in the badge directly above. To facilitate interpretation of the code in this repository, we have copied over dataset metadata--see [`DATA_README.md`](DATA_README.md). Raw ECCO data is available for download from [NASA PO.DAAC](https://podaac.jpl.nasa.gov/); see the table in `DATA_README.md` for the PO.DAAC entries that we used.
 
 ### ACCESS
 
