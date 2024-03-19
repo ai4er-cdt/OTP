@@ -136,7 +136,7 @@ See the tables below for the notebooks to run to reproduce each figure and table
 |    10    |    `solodoch_replication/train_models.ipynb`    |
 |    11    |    `solodoch_replication/train_models.ipynb`    |
 |    12    |             `neural_networks.ipynb`             |
-|    13    |             'neural_networks.ipynb'              |
+|    13    |             `neural_networks.ipynb`             |
 |    14    |    `RAPID_transfer_linear_regression.ipynb`     |
 |    15    |   `latitude_transfer_linear_regression.ipynb`   |
 |    16    |   `latitude_transfer_linear_regression.ipynb`   |
