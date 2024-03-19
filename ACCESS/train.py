@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 import SimDataset
 import torch as t
 import torch.nn as nn
@@ -6,63 +7,118 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 from itertools import cycle
 from tqdm import trange
-import numpy as np
 
 
 parent_dir = os.path.dirname(os.path.abspath("train.py"))
-print(f"parent_dir: {parent_dir}")
 t.manual_seed(123456)
 
 # default hyperparameters
-batch_size = 32
-max_iters = 5000
+batch_size = 32 
+weight_decay = 1e-5
 # ---------------
 
-def train_model(model: nn.Module, 
-                name: str, 
-                X: t.Tensor, 
-                y: t.Tensor, 
-                save_dir: str,
-                lr,
-                device: str|None=None):
-    
-    if device == None:
-        device = "cuda" if t.cuda.is_available() else "cpu"
-    print(f"device: {device}")
+class EarlyStopping:
+    def __init__(self, patience: int=5, min_delta: int=0, threshold: float=float("inf")):
+        self.patience = patience
+        self.min_delta = min_delta
+        self.counter = 0
+        self.best_loss = float("inf")
+        self.threshold = threshold
+        self.early_stop = False
 
+    def __call__(self, val_loss: float):
+        if val_loss < self.best_loss:
+            self.best_loss = val_loss
+            self.counter = 0
+        elif val_loss > self.best_loss + self.min_delta and self.best_loss < self.threshold:
+            self.counter += 1
+            if self.counter >= self.patience:
+                self.early_stop = True
+
+def train_model(model: nn.Module,  
+                X_train: t.Tensor, 
+                y_train: t.Tensor, 
+                name: str="model",
+                save_dir: str="../ACCESS",
+                X_val: Optional[t.Tensor]=None,
+                y_val: Optional[t.Tensor]=None,
+                early_stopping: Optional[bool]=False,
+                eval_iter: Optional[int]=None,
+                device: Optional[str]=None,
+                lr: float=1e-3,
+                max_iters: int=10000):
+    
+    if device == None: device = "cuda" if t.cuda.is_available() else "cpu"
+    model = model.to(device)
+    print(f"device: {device}")
     # print number of parameters
     print(f"{sum([p.numel() for p in model.parameters()])} parameters.")
         
     # get training data
-    train_dataset = SimDataset.SimDataset(X, y, device)
+    train_dataset = SimDataset.SimDataset(X_train, y_train, device)
     train_DL = DataLoader(train_dataset, batch_size, shuffle=True)
     data_iterator = cycle(train_DL)
+
+    validate = X_val is not None
 
     # training
     model.train()
     criterion = nn.MSELoss()
-    opt = t.optim.AdamW(model.parameters(), lr=lr)
-    full_loss = []
-    for iter in trange(max_iters):
-        # use dataloader to sample a batch
-        x, y = next(data_iterator)
-        # update model
-        out = model(x)
-        loss = criterion(out.squeeze(-1), y); full_loss.append(loss.item())
-        opt.zero_grad(set_to_none=True)
-        loss.backward()
-        opt.step()
+    opt = t.optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+    train_loss = []; val_loss = []
+    if early_stopping: es = EarlyStopping(patience=100, min_delta = 0.01, threshold=2.25)
+    if eval_iter is None:
+        for iter in trange(max_iters):
+            # use dataloader to sample a batch
+            x, y = next(data_iterator)
+            x = x.float(); y = y.float()
+            # update model
+            out = model(x)
+            loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
+            opt.zero_grad(set_to_none=True)
+            loss.backward()
+            opt.step()
 
-    print(os.path.join(parent_dir, f"{save_dir}/saved_models/{name}.pt"))
-    t.save(model.state_dict(), os.path.join(parent_dir, f"{save_dir}/saved_models/{name}.pt"))
+            if validate:
+                out = model(X_val.to(device))
+                loss = criterion(out.squeeze(-1), y_val.to(device)); val_loss.append(loss.item())
+                es(loss.item())
+                if es.early_stop: 
+                    print("early stopping")
+                    break
+    else:
+        for iter in range(max_iters):
+            # use dataloader to sample a batch
+            x, y = next(data_iterator)
+            x = x.float(); y = y.float()
+            # update model
+            out = model(x)
+            loss = criterion(out.squeeze(-1), y); train_loss.append(loss.item())
+            opt.zero_grad(set_to_none=True)
+            loss.backward()
+            opt.step()
+            if iter % eval_iter == 0:
+                print("----------")
+                print(f"Training Loss: {loss.item()}")
 
-    fig, ax = plt.subplots(figsize=(10, 3))
-    ax.plot(np.sqrt(full_loss)*1e-6, linestyle="--", color="red", alpha=0.5)
-    ax.set_ylabel("RMSE / Sv"); ax.set_xlabel("Training Step")
-    ax.set_title(f"{name}: Loss")
-    plt.savefig(os.path.join(parent_dir, f"{save_dir}/loss_curves/{name}.png"), dpi=400)
-    plt.close()
-
-    print(f"final RMSE loss: {np.sqrt(loss.item())*1e-6} Sv")
-    print(f"model saved to {save_dir}/saved_models/{name}.pt")
-    print(f"loss curve saved to {save_dir}/loss_curves/{name}.png")
+            if validate:
+                out = model(X_val.to(device))
+                loss = criterion(out.squeeze(-1), y_val.to(device)); val_loss.append(loss.item())
+                if iter % eval_iter == 0:
+                    print(f"Validation Loss: {loss.item()}")
+                es(loss.item())
+                if es.early_stop: 
+                    print("early stopping")
+                    break
+    if validate:
+        t.save(
+        model.state_dict(),
+        os.path.join(parent_dir, f"{save_dir}/saved_models/{name}.pt"),
+    )
+        return model, train_loss, val_loss
+    else:
+        t.save(
+        model.state_dict(),
+        os.path.join(parent_dir, f"{save_dir}/saved_models/{name}.pt"),
+    )
+        return model, train_loss

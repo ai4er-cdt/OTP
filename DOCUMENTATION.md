@@ -11,7 +11,7 @@ _If you find any bugs in the code or have trouble setting up your environment, p
 To run the project locally, we recommend you set up your environment using [`conda`](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html).
 
 1. Clone this repository using `git clone --recursive <HTTPS or SSH>` to ensure the ECCO submodule is loaded as well.
-2. Navigate to the newly created repository directory (i.e., use `cd OTP`).
+2. Navigate to the newly created repository directory (i.e., use `cd oceans-gtc`).
 3. Edit the `environment.yml` file to include your own local filepath for your `conda` environments.
    - If you're not sure what this filepath is, you can check using `conda info --envs`. The filepath should be `[FILEPATH FOR BASE ENVIRONMENT]/envs/`. Notice that this ends in `gtc`--this will be the name of the created `conda` environment.
 4. Create your `conda` Python environment using `conda env create -f environment.yml`.
@@ -131,12 +131,12 @@ See the tables below for the notebooks to run to reproduce each figure and table
 |     5    |                        -                        |
 |     6    | `streamfunction/plotting_streamfunctions.ipynb` |
 |     7    | `streamfunction/plotting_streamfunctions.ipynb` |
-|     8    |                        ?                        |
+|     8    |                        -                        |
 |     9    |            `linear_regression.ipynb`            |
 |    10    |    `solodoch_replication/train_models.ipynb`    |
 |    11    |    `solodoch_replication/train_models.ipynb`    |
 |    12    |             `neural_networks.ipynb`             |
-|    13    |             'neural_networks.ipynb'              |
+|    13    |             `neural_networks.ipynb`             |
 |    14    |    `RAPID_transfer_linear_regression.ipynb`     |
 |    15    |   `latitude_transfer_linear_regression.ipynb`   |
 |    16    |   `latitude_transfer_linear_regression.ipynb`   |
