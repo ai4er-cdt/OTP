@@ -11,7 +11,7 @@ _If you find any bugs in the code or have trouble setting up your environment, p
 To run the project locally, we recommend you set up your environment using [`conda`](https://conda.io/projects/conda/en/latest/user-guide/getting-started.html).
 
 1. Clone this repository using `git clone --recursive <HTTPS or SSH>` to ensure the ECCO submodule is loaded as well.
-2. Navigate to the newly created repository directory (i.e., use `cd OTP`).
+2. Navigate to the newly created repository directory (i.e., use `cd oceans-gtc`).
 3. Edit the `environment.yml` file to include your own local filepath for your `conda` environments.
    - If you're not sure what this filepath is, you can check using `conda info --envs`. The filepath should be `[FILEPATH FOR BASE ENVIRONMENT]/envs/`. Notice that this ends in `gtc`--this will be the name of the created `conda` environment.
 4. Create your `conda` Python environment using `conda env create -f environment.yml`.
