@@ -4,15 +4,13 @@
 
 ## Project Description
 
-**TODO: fill this section in!**
+In this study, we assess how satellite-observable variables can be used to infer abyssal Meridional Overturning Circulation (MOC) strength using machine learning by leveraging the Estimating the Circulation and Climate of the Ocean (ECCO) ocean state estimate. We replicate and improve upon previous methods, and provide a thorough baseline for predicting the abyssal MOC strength using regularised linear regression. We incorporate the Australian Community Climate and Earth System Simulator Ocean Model (ACCESS) a high-resolution numerical ocean circulation model, and observational Rapid Climate Change-Meridional Overturning Circulation and Heatflux Array (RAPID) data, a cross-basin sensor array that directly measures the Atlantic MOC strength. We provide initial evidence of an approximately linear relationship between satellite-observable variables and abyssal MOC strength through model evaluation on both ECCO and ACCESS, demonstrate the utility of observational data to predict long-range oceanic dependencies through integration of RAPID, and show that a deep learning model is able to accurately capture latitude-invariant circulation dynamics across the Southern Ocean in ECCO.
+
+This work was carried out as part of the [Artificial Intelligence for Environmental Risks](https://ai4er-cdt.esc.cam.ac.uk/) (AI4ER) Centre for Doctoral Training Guided Team Challenge (GTC), which ran from November, 2023 to March, 2024.
 
 ## Documentation
 
-Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository.
-
-## Acknowledgements
-
-We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and Alberto Naveira Garabato--as well as our project mentors--Josh Lanham and Kate Oglethorpe. Their guidance throughout was instrumental in our success as a team. We would also like to thank the AI4ER support staff--Annabelle Scott and Adriana Dote--for their help navigating the complex logistics of the Guided Team Challenge.
+Please see the included [`DOCUMENTATION.md`](DOCUMENTATION.md) file for an overview of the repository structure. We include [tables](https://github.com/ai4er-cdt/OTP/blob/main/DOCUMENTATION.md#reproducing-report-figures-and-tables) that direct the user towards the appropriate notebook for reproducing each table and figure in the final report.
 
 -----
 
@@ -36,19 +34,35 @@ We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and 
 
 </table>
 
+## Acknowledgements
+
+We would like to thank our faculty supervisors--Ali Mashayek, Laura Cimoli, and Alberto Naveira Garabato--as well as our project mentors--Josh Lanham and Kate Oglethorpe. Their guidance throughout was instrumental in our success as a team. We would also like to thank the AI4ER support staff--Annabelle Scott and Adriana Dote--for their help navigating the complex logistics of the GTC.
+
 -----
 
 ## License and Citation
 
 If you use the code in this repository, please consider citing it--see the [`citation.cff`](citation.cff) file or use the "Cite this repository" function on the right sidebar. All code is under the MIT license--see the [`LICENSE`](LICENSE) file.
 
+-----
+
 ## Data Availability
 
-**TODO: fill this section in!**
+### ECCO 
 
-- Raw ECCO data is available for download from NASA PO.DAAC (see [https://podaac.jpl.nasa.gov/](https://podaac.jpl.nasa.gov/)). Entries used for our analysis are listed in the Appendix of our report.
-- ACCESS data was provided to us directly by colleagues at the National Oceanography Centre (NOC; Southampton, UK) and is not publically available but may be provided upon reasonable request.
-- RAPID data can be downloaded from the NOC British Oceanographic Data Centre: [https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10832706.svg)](https://doi.org/10.5281/zenodo.10832706)
+
+All ECCO data that we extracted is included in the Zenodo repository linked in the badge directly above. To facilitate interpretation of the code in this repository, we have copied over dataset metadata--see [`DATA_README.md`](DATA_README.md). Raw ECCO data is available for download from [NASA PO.DAAC](https://podaac.jpl.nasa.gov/); see the table in `DATA_README.md` for the PO.DAAC entries that we used.
+
+### ACCESS
+
+ACCESS data was provided to us directly by colleagues at the National Oceanography Centre (NOC; Southampton, UK) and is not publicly available but may be provided upon reasonable request. Team member emails are linked above.
+
+### RAPID
+
+[![DOI](https://img.shields.io/badge/DOI-10.5285%2F04c79ece--3186--349a--e063--6c86abc0158c-blue)](https://doi.org/10.5285/04c79ece-3186-349a-e063-6c86abc0158c)
+
+RAPID data can be downloaded from the NOC British Oceanographic Data Centre (linked in the badge directly above). This data was used in the provided format. We primarily make use of `moc_transports_200404_2022215.nc` and `moc_vertical_200404_2022215.nc`. 
 
 -----
 

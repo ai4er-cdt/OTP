@@ -76,6 +76,13 @@ def reshape_inputs(data: xr.core.dataset.Dataset,
     return t.Tensor(data) if return_pt else data
 
 def custom_seasonal_decompose(mode, data, dims = ('time', 'latitude', 'longitude'), train_pct = 0.7):
+
+    """
+    A wrapper function over code from Sharan's model training notebook. Allows for additive
+    timeseries decomposition using only info from the training portion of the timeseries for fitting
+    the trend line and seasonal components.
+    """
+
     # Extract important variables
     vars = ['SSH', 'SST', 'SSS', 'OBP', 'ZWS']
     times = data.time.values
@@ -392,25 +399,3 @@ def custom_MAPE(y_test, y_pred, threshold = 0, return_num_discarded = False):
         return mape, initial_len - new_len
 
     return mape
-
-if __name__ == '__main__':
-    import pickle
-    import matplotlib.pyplot as plt
-
-    data_home = '/Users/emiliolr/Google Drive/My Drive/GTC'
-
-    inputs = xr.open_dataset(f'{data_home}/ecco_data_minimal/60S.nc')
-    inputs = inputs.isel(latitude = 1) # pull out just the lat of interest
-    inputs = inputs.expand_dims({'latitude' : 1}) # add back in latitude dim to make things work better
-
-    outputs_fp = f'{data_home}/ecco_data_minimal/60S_moc_density.pickle'
-    with open(outputs_fp, 'rb') as f:
-        outputs = pickle.load(f)
-    outputs = np.expand_dims(outputs, 1)
-    outputs = xr.Dataset(data_vars = {'moc' : (['time', 'latitude'], outputs)},
-                         coords = {'time' : inputs.time, 'latitude' : np.atleast_1d(-60)})
-
-    new_outputs = apply_preprocessing(outputs, mode = 'outputs', remove_trend = True, remove_season = True,
-                                      standardize = False, lowpass = False)
-    to_check = new_outputs.moc.isel(time = slice(0, int(0.7 * len(outputs.time))))
-    print(to_check.mean('time'), to_check.std('time'))
