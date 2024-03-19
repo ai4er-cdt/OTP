@@ -122,7 +122,7 @@ See the tables below for the notebooks to run to reproduce each figure and table
 
 ### Figures
 
-| Figure # |                     Notebook                    |
+| Figure # |                    Notebook                     |
 |:--------:|:-----------------------------------------------:|
 |     1    |           `archive/basin_masks.ipynb`           |
 |     2    |                        -                        |
@@ -136,11 +136,11 @@ See the tables below for the notebooks to run to reproduce each figure and table
 |    10    |    `solodoch_replication/train_models.ipynb`    |
 |    11    |    `solodoch_replication/train_models.ipynb`    |
 |    12    |             `neural_networks.ipynb`             |
-|    13    |                        ?                        |
-|    14    |     `RAPID_transfer_linear_regression.ipynb`    |
+|    13    |             'neural_networks.ipynb'              |
+|    14    |    `RAPID_transfer_linear_regression.ipynb`     |
 |    15    |   `latitude_transfer_linear_regression.ipynb`   |
 |    16    |   `latitude_transfer_linear_regression.ipynb`   |
-|    17    |       `southern_ocean_modelling/MLP.ipynb`      |
+|    17    |      `southern_ocean_modelling/MLP.ipynb`       |
 |    18    |             `neural_networks.ipynb`             |
 
 ### Tables
