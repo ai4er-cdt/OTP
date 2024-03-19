@@ -14,7 +14,7 @@ t.manual_seed(123456)
 
 # default hyperparameters
 batch_size = 32
-max_iters = 5000 
+max_iters = 2500
 lr = 1e-3
 weight_decay = 1e-5
 # ---------------
