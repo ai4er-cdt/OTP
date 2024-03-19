@@ -131,7 +131,7 @@ See the tables below for the notebooks to run to reproduce each figure and table
 |     5    |                        -                        |
 |     6    | `streamfunction/plotting_streamfunctions.ipynb` |
 |     7    | `streamfunction/plotting_streamfunctions.ipynb` |
-|     8    |                        ?                        |
+|     8    |                        -                        |
 |     9    |            `linear_regression.ipynb`            |
 |    10    |    `solodoch_replication/train_models.ipynb`    |
 |    11    |    `solodoch_replication/train_models.ipynb`    |
