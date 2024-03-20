@@ -131,16 +131,16 @@ See the tables below for the notebooks to run to reproduce each figure and table
 |     5    |                        -                        |
 |     6    | `streamfunction/plotting_streamfunctions.ipynb` |
 |     7    | `streamfunction/plotting_streamfunctions.ipynb` |
-|     8    |                        -                        |
-|     9    |            `linear_regression.ipynb`            |
+|     8    |            `linear_regression.ipynb`            |
+|     9    |    `solodoch_replication/train_models.ipynb`    |
 |    10    |    `solodoch_replication/train_models.ipynb`    |
-|    11    |    `solodoch_replication/train_models.ipynb`    |
+|    11    |             `neural_networks.ipynb`             |
 |    12    |             `neural_networks.ipynb`             |
-|    13    |             `neural_networks.ipynb`             |
-|    14    |    `RAPID_transfer_linear_regression.ipynb`     |
+|    13    |    `RAPID_transfer_linear_regression.ipynb`     |
+|    14    |   `latitude_transfer_linear_regression.ipynb`   |
 |    15    |   `latitude_transfer_linear_regression.ipynb`   |
-|    16    |   `latitude_transfer_linear_regression.ipynb`   |
-|    17    |      `southern_ocean_modelling/MLP.ipynb`       |
+|    16    |      `southern_ocean_modelling/MLP.ipynb`       |
+|    17    |                        -                        |
 |    18    |             `neural_networks.ipynb`             |
 
 ### Tables
@@ -157,18 +157,16 @@ See the tables below for the notebooks to run to reproduce each figure and table
 |    6    |          `neural_networks.ipynb`          |
 |    7    |          `neural_networks.ipynb`          |
 |    8    |                     -                     |
-|    9    |  `RAPID_transfer_linear_regression.ipynb` |
-|    10   |   `RAPID_transfer_neural_network.ipynb`   |
-|    11   |        `southern_ocean_modelling/*`       |
-|    12   |           `ACCESS/models.ipynb`           |
-|    13   |           `ACCESS/models.ipynb`           |
-|    14   |           `ACCESS/models.ipynb`           |
-|    15   |         `linear_regression.ipynb`         |
-|    16   |         `linear_regression.ipynb`         |
-|    17   |                     -                     |
-|    18   |  `RAPID_transfer_linear_regression.ipynb` |
-|    19   |   `RAPID_transfer_neural_network.ipynb`   |
-|    20   |                     -                     |
+|    9    |    `southern_ocean_modelling/*.ipynb`     |
+|    10   |           `ACCESS/models.ipynb`           |
+|    11   |           `ACCESS/models.ipynb`           |
+|    12   |         `linear_regression.ipynb`         |
+|    13   |         `linear_regression.ipynb`         |
+|    14   |                     -                     |
+|    15   |  `RAPID_transfer_linear_regression.ipynb` |
+|    16   |   `RAPID_transfer_neural_network.ipynb`   |
+|    17   |           `ACCESS/models.ipynb`           |
+|    18   |                     -                     |
 
 -----
 
