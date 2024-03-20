@@ -1,6 +1,6 @@
 # AI4ER Guided Team Challenge 2024
 
-[![DOI](https://zenodo.org/badge/735913470.svg)](https://zenodo.org/doi/10.5281/zenodo.10817670) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.10841513.svg)](https://doi.org/10.5281/zenodo.10841513) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Project Description
 
